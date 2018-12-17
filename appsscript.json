@@ -1,0 +1,18 @@
+{
+    "timeZone": "Europe/Paris",
+    "dependencies": {
+    },
+    "oauthScopes": [
+      "https://www.googleapis.com/auth/gmail.addons.execute",
+      "https://www.googleapis.com/auth/gmail.addons.current.message.readonly"
+    ],
+    "exceptionLogging": "STACKDRIVER",
+    "gmail": {
+      "name": "Handpicked Agencies Gmail Addon",
+      "logoUrl": "https://scontent-amt2-1.xx.fbcdn.net/v/t1.0-9/26169416_1967665540141175_6896518217049360624_n.jpg?_nc_cat=106&_nc_ht=scontent-amt2-1.xx&oh=62d0525ad1fdb4cabf781fae44038f1d&oe=5CA89E01",
+      "contextualTriggers": [{
+        "unconditional": {},
+        "onTriggerFunction": "openSideBar"
+      }]
+    }
+  }
