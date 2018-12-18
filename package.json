@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/marc0tjevp/2.2-Handpicked-AddOn#readme",
   "dependencies": {
-    "mongoose": "^5.4.0"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.0",
+    "morgan": "^1.9.1"
   }
 }

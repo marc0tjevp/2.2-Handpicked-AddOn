@@ -11,11 +11,8 @@ require('./utils/database.util')
 require('./utils/extension.util')
 
 // Routing
-let example_routes = require('./routes/example.routes')
-
-app.get('/', (req, res) => res.status(200).json({"messsage": "Hello World!"}))
-app.use('/example', example_routes)
-app.use('*', (req, res) => res.status(404).json({"message": "Not found"}).end())
+let routes = require('./routes/routes')
+app.use('/api', routes)
 
 // Listen on port
 var server = app.listen(port, function () {
