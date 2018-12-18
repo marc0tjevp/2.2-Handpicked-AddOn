@@ -1,0 +1,7 @@
+{
+    "port": 8080,
+    "databases": {
+        "mongo": "mongodb://localhost/handpicked",
+        "mongo-test": "mongodb://localhost/handpicked_test"
+    }
+}
