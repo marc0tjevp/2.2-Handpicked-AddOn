@@ -17,6 +17,7 @@ Gmail Addon for Handpicked Labs.
 │   └── example.controller.js
 ├── routes
 │   └── example.routes.js
+│   └── routes.js
 ├── utils
 │   ├── database.util.js
 │   └── extension.util.js
@@ -42,5 +43,10 @@ Gmail Addon for Handpicked Labs.
 - Use the folders for config, routes, utils and controllers respectively. Names of folders are plural (except for config).
 - Name files `name.type.extension`. E.g. `user.routes.js`
 - Use the singular forms of entities. E.g. `user`, `person`, `student`
+
+### Routing
+- Declare routing in `routes/routes.js` by declaring a controller for the parent link (`/users`). 
+- Create a corresponding routing file for the children (`routes/user.routes.js`).
+- Use controller functions as middleware
 
 For questions about conventions, debate in the Discord server. Try to look for correct usage of these conventions when reviewing code or pull requests :D.
