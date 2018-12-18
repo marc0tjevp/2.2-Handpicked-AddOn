@@ -1,0 +1,23 @@
+{
+  "name": "2.2-handpicked-addon",
+  "version": "1.0.0",
+  "description": "API for the Gmail Addon to interact with the .NET API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marc0tjevp/2.2-Handpicked-AddOn.git"
+  },
+  "author": "Marco van Poortvliet, Fer Schmidt, Sander Postma, Djim Oomes, Kelly Prumchuen, Arantxio Gottmers",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marc0tjevp/2.2-Handpicked-AddOn/issues"
+  },
+  "homepage": "https://github.com/marc0tjevp/2.2-Handpicked-AddOn#readme",
+  "dependencies": {
+    "mongoose": "^5.4.0"
+  }
+}
