@@ -173,6 +173,39 @@ function openSideBar(e) {
     return cardMailOverview.addSection(ticketSection).build();
   }
 
+  //Check if customer is connected to a domain, else select one???
+  function createDomainOverview() {
+    var cardMailOverview = CardService.newCardBuilder()
+    .setName("Domain Overview")
+    .setHeader(
+      CardService.newCardHeader()
+      .setTitle('Domain')
+    );
+
+    var domainName = CardService.newCardSection();
+
+    domainName.setHeader('ING Corporation');      
+
+    //If staticjson.domain != null
+    domainName.addWidget(CardService.newKeyValue()
+      .setTopLabel('ING')
+      .setContent('Blabla, side corp of ING'));
+    //else
+    var dropdownGroup = CardService.newSelectionInput()
+    .setType(CardService.SelectionInputType.DROPDOWN)
+    .setTitle("Dropdown if there customer is not connector to domain")
+    .setFieldName("TestFieldName")
+    .addItem("ING", false)
+    .addItem("RABOBANK", true)
+    .addItem("ABN-AMRO", false)
+    .setOnChangeAction(CardService.newAction()
+        .setFunctionName("handleCheckboxChange"));
+
+    domainName.addWidget(dropdownGroup);
+
+    return cardMailOverview.addSection(domainName).build();
+  }
+
   return [
     createContactOverview(),
     createDealOverview(),
