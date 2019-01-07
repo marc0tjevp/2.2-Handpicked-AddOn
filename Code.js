@@ -13,6 +13,48 @@ function openSideBar(e) {
   var body = message.getPlainBody();
   var messageDate = message.getDate();
 
+  var staticjson = {
+    contacts: [
+      {
+        name: "test 1",
+        email: "test1@test.nl"
+      },
+      {
+        name: "test 2",
+        email: "test2@test.nl"
+      }
+    ],
+    deals: [
+      {
+        title: "title1",
+        content: "some content"
+      },
+      {
+        title: "title2",
+        content: "some content"
+      }
+    ],
+    appointments: [
+      {
+        date: "10-2-2019",
+        content: "A birthday!"
+      },
+      {
+        date: "18-1-2019",
+        content: "oplevering"
+      }
+    ],
+    tickets: [
+      {
+        title: "ticket1",
+        content: "some content"
+      },
+      {
+        title: "ticket2",
+        content: "some content"
+      }
+    ]
+  }
 
   // Test send email to API
   var url = "https://hp-tests.herokuapp.com/api/email";
@@ -36,81 +78,106 @@ function openSideBar(e) {
   // Empty action for button
   var action = CardService.newAction().setFunctionName('notificationCallback');
 
-  // Construct Sidebar
-  function createMailOverview() {
-    return CardService
-      .newCardBuilder()
-      .setHeader(
-        CardService.newCardHeader()
-        .setTitle('Bedrijfsnaam')
-      )
+  function createContactOverview() {
+    var cardMailOverview = CardService.newCardBuilder()
+    .setName("Contact Overview")
+    .setHeader(
+      CardService.newCardHeader()
+      .setTitle('Contacts')
+    );
 
-      // Contacts
-      .addSection(
-        CardService.newCardSection()
-        .setHeader('CONTACTPERSONEN')
-        .addWidget(CardService.newKeyValue()
-          .setIconUrl('https://png.pngtree.com/svg/20161230/little_helper_657605.png')
-          .setContent(sender)
-        )
-        .addWidget(CardService.newButtonSet()
-          .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
-          .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(action))
-        )
-      )
+    // Contacts Section
+    var contactSection = CardService.newCardSection();
 
-      // Deals
-      .addSection(
-        CardService.newCardSection()
-        .setHeader('DEALS')
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Deal A")
-          .setContent("Over 3 weken")
-        )
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Deal B")
-          .setContent("Over 2 weken")
-        )
-      )
+    contactSection.setHeader('CONTACTPERSONEN');
+    contactSection.addWidget(CardService.newKeyValue()
+      .setIconUrl('https://png.pngtree.com/svg/20161230/little_helper_657605.png')
+      .setContent(sender)
+    );
+    contactSection.addWidget(CardService.newButtonSet()
+      .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
+      .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(action))
+    );
 
-      // Appointments
-      .addSection(
-        CardService.newCardSection()
-        .setHeader('AFSPRAKEN')
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("12 januari | 12:00 - 13:00")
-          .setContent("Fingersplitz Room")
-        )
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("14 januari | 16:00 - 17:00")
-          .setContent("Fingersplitz Room")
-        )
-      )
+    return cardMailOverview.addSection(contactSection).build();
+  }
 
-      // Tickets
-      .addSection(
-        CardService.newCardSection()
-        .setHeader('TICKETS')
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Ticket #0001")
-          .setContent(senderName)
-        )
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Ticket #0017")
-          .setContent(senderName)
-        )
-      )
-      .build();
+  function createDealOverview() {
+    var cardMailOverview = CardService.newCardBuilder()
+    .setName("Deal Overview")
+    .setHeader(
+      CardService.newCardHeader()
+      .setTitle('Deals')
+    );
+
+    // Deals Section
+    var dealSection = CardService.newCardSection();
+
+    dealSection.setHeader('DEALS');
+    staticjson.deals.forEach(function(deal) {
+      dealSection.addWidget(
+        CardService.newKeyValue()
+        .setTopLabel(deal.title)
+        .setContent(deal.content)
+      );
+    });
+
+    return cardMailOverview.addSection(dealSection).build();
+  }
+
+  function createAppointmentOverview() {
+    var cardMailOverview = CardService.newCardBuilder()
+    .setName("Appointment Overview")
+    .setHeader(
+      CardService.newCardHeader()
+      .setTitle('Appointments')
+    );
+
+    // Appointments Section
+    var appointmentSection = CardService.newCardSection();
+
+    appointmentSection.setHeader('AFSPRAKEN');
+
+    staticjson.appointments.forEach(function(appointment) {
+      appointmentSection.addWidget(
+        CardService.newKeyValue()
+        .setTopLabel(appointment.date)
+        .setContent(appointment.content)
+      );
+    });
+
+    return cardMailOverview.addSection(appointmentSection).build();
+  }
+
+  function createTicketOverview() {
+    var cardMailOverview = CardService.newCardBuilder()
+    .setName("Ticket Overview")
+    .setHeader(
+      CardService.newCardHeader()
+      .setTitle('Tickets')
+    );
+
+    // Tickets Section
+    var ticketSection = CardService.newCardSection();
+
+    ticketSection.setHeader('TICKETS');
+      
+    staticjson.tickets.forEach(function(ticket) {
+      ticketSection.addWidget(
+        CardService.newKeyValue()
+        .setTopLabel(ticket.title)
+        .setContent(ticket.content)
+      );
+    });
+
+    return cardMailOverview.addSection(ticketSection).build();
   }
 
   return [
-    createMailOverview()
+    createContactOverview(),
+    createDealOverview(),
+    createDealOverview(),
+    createTicketOverview()
   ]
 
 }
