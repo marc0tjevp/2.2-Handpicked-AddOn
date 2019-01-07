@@ -22,20 +22,20 @@
 
 
 // Import Axios to make requests
-const axios = require('axios');
+const axios = require('axios')
 
 /**
  * Request Handler to call other API's
  * @param string verb
  * @param string endpoint
- * @param { obj } data
- * @returns { json object }
+ * @param { object } data
+ * @returns { object }
  */
 
 var doRequest = (verb, endpoint, data, callback) => {
 
     // Log Request
-    console.log('\nRequest Handler \n-------- \nVerb: ' + verb + ' \nEndpoint: ' + endpoint + ' \nData: ' + data)
+    console.log('\nRequest Handler \n-------- \nVerb: ' + verb + ' \nEndpoint: ' + endpoint + ' \nData: ' + JSON.stringify(data))
 
     // Check the verb
     if (verb == 'get' || verb == 'post' || verb == 'put' || verb == 'delete') {
@@ -52,13 +52,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                     // On status 200, return data
                     if (response.status == 200) {
                         callback(response.data)
-                    }
-
-                    // On status 401, return not authorized
-                    if (response.status == 401) {
-                        callback({
-                            "Request Handler": "Not Authorized"
-                        })
+                        return
                     }
 
                     // Axios should filter out error 500 to the catch block, just to be sure.
@@ -66,6 +60,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                         callback({
                             "Request Handler": "Server returned error code 500"
                         })
+                        return
                     }
 
                     // All Other cases
@@ -78,16 +73,34 @@ var doRequest = (verb, endpoint, data, callback) => {
                 // Catch errors from Axios
                 .catch((error) => {
 
-                    // On status 500, return an error message
+                    // On status 500, return an error
                     if (error.response.status == 500) {
                         callback({
                             "Request Handler": "Server returned error code 500"
                         })
+                        return
                     }
 
-                    // All Other cases
+                    // On status 401, return not authorized
+                    if (error.response.status == 401) {
+                        callback({
+                            "Request Handler": "Server returned error code 401"
+                        })
+                        return
+                    }
+
+                    // On status 404, return not found
+                    if (error.response.status == 404) {
+                        callback({
+                            "Request Handler": "Server returned error code 404"
+                        })
+                        return
+                    }
+
+                    // In all other cases
                     callback({
-                        "Request Handler": "The server returned an unexpected error: " + error
+                        "Request Handler": "The server returned an unexpected error",
+                        "Error": error.toString()
                     })
 
                 })
@@ -97,7 +110,7 @@ var doRequest = (verb, endpoint, data, callback) => {
         // If the verb is a POST
         else if (verb == 'post') {
 
-            // Do a get request to said endpoint
+            // Do a POST request to said endpoint
             axios.post(endpoint, data)
 
                 // Handle the Response
@@ -106,6 +119,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                     // On status 200, return data
                     if (response.status == 200) {
                         callback(response.data)
+                        return
                     }
 
                     // Axios should filter out error 500 to the catch block, just to be sure.
@@ -113,6 +127,140 @@ var doRequest = (verb, endpoint, data, callback) => {
                         callback({
                             "Request Handler": "Server returned error code 500"
                         })
+                        return
+                    }
+
+                    // In all other cases
+                    callback({
+                        "Request Handler": "The server returned an unexpected statuscode, but it didn't end up in the catch block"
+                    })
+
+                })
+
+                // Catch errors from Axios
+                .catch((error) => {
+
+                    // On status 500, return an error
+                    if (error.response.status == 500) {
+                        callback({
+                            "Request Handler": "Server returned error code 500"
+                        })
+                        return
+                    }
+
+                    // On status 401, return not authorized
+                    if (error.response.status == 401) {
+                        callback({
+                            "Request Handler": "Server returned error code 401"
+                        })
+                        return
+                    }
+
+                    // On status 404, return not found
+                    if (error.response.status == 404) {
+                        callback({
+                            "Request Handler": "Server returned error code 404"
+                        })
+                        return
+                    }
+
+                    // In all other cases
+                    callback({
+                        "Request Handler": "The server returned an unexpected error",
+                        "Error": error.toString()
+                    })
+
+                })
+
+        }
+
+        // If the verb is a PUT
+        else if (verb == 'put') {
+
+            // Do a PUT request to said endpoint
+            axios.put(endpoint, data)
+
+                // Handle the Response
+                .then((response) => {
+
+                    // On status 200, return data
+                    if (response.status == 200) {
+                        callback(response.data)
+                        return
+                    }
+
+                    // Axios should filter out error 500 to the catch block, just to be sure.
+                    if (response.status == 500) {
+                        callback({
+                            "Request Handler": "Server returned error code 500"
+                        })
+                        return
+                    }
+
+                    // In all other cases
+                    callback({
+                        "Request Handler": "The server returned an unexpected statuscode, but it didn't end up in the catch block"
+                    })
+
+                })
+
+                // Catch errors from Axios
+                .catch((error) => {
+
+                    // On status 500, return an error
+                    if (error.response.status == 500) {
+                        callback({
+                            "Request Handler": "Server returned error code 500"
+                        })
+                        return
+                    }
+
+                    // On status 401, return not authorized
+                    if (error.response.status == 401) {
+                        callback({
+                            "Request Handler": "Server returned error code 401"
+                        })
+                        return
+                    }
+
+                    // On status 404, return not found
+                    if (error.response.status == 404) {
+                        callback({
+                            "Request Handler": "Server returned error code 404"
+                        })
+                        return
+                    }
+
+                    // In all other cases
+                    callback({
+                        "Request Handler": "The server returned an unexpected error",
+                        "Error": error.toString()
+                    })
+
+                })
+
+        }
+
+        else if (verb == 'delete') {
+
+            // Do a DELETE request to said endpoint
+            axios.delete(endpoint)
+
+                // Handle the Response
+                .then((response) => {
+
+                    // On status 200, return data
+                    if (response.status == 200) {
+                        callback(response.data)
+                        return
+                    }
+
+                    // Axios should filter out error 500 to the catch block, just to be sure.
+                    if (response.status == 500) {
+                        callback({
+                            "Request Handler": "Server returned error code 500"
+                        })
+                        return
                     }
 
                     // All Other cases
@@ -125,32 +273,37 @@ var doRequest = (verb, endpoint, data, callback) => {
                 // Catch errors from Axios
                 .catch((error) => {
 
+                    // On status 500, return an error
                     if (error.response.status == 500) {
                         callback({
                             "Request Handler": "Server returned error code 500"
                         })
+                        return
                     }
 
                     // On status 401, return not authorized
                     if (error.response.status == 401) {
                         callback({
-                            "Request Handler": "Not Authorized"
+                            "Request Handler": "Server returned error code 401"
                         })
+                        return
                     }
 
+                    // On status 404, return not found
                     if (error.response.status == 404) {
                         callback({
                             "Request Handler": "Server returned error code 404"
                         })
+                        return
                     }
 
+                    // In all other cases
                     callback({
-                        "Request Handler": "The server returned an unexpected error: " + error
+                        "Request Handler": "The server returned an unexpected error",
+                        "Error": error.toString()
                     })
 
                 })
-
-
         }
 
     }
@@ -159,7 +312,7 @@ var doRequest = (verb, endpoint, data, callback) => {
     else {
         callback({
             "Request Handler": "Please provide one of the following verbs: 'get', 'post', 'put' or 'delete'"
-        });
+        })
     }
 
 }
