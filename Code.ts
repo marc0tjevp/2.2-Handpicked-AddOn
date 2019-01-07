@@ -4,5 +4,12 @@ function openSideBar(e) {
   
   var messageId = e.messageMetadata.messageId;
   var message = GmailApp.getMessageById(messageId);
-  return [CardService.newCardBuilder().addSection(CardService.newCardSection().addWidget(CardService.newTextParagraph().setText(message.getFrom()))).setHeader(CardService.newCardHeader().setTitle("Email")).build()]
+  
+  return [CardService.newCardBuilder().
+    addSection(CardService.newCardSection().
+    addWidget(CardService.newTextParagraph().
+    setText(message.getFrom()))).
+    setHeader(CardService.newCardHeader().
+    setTitle("Email")).
+    build()]
 }
