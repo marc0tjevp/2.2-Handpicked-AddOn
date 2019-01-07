@@ -13,6 +13,49 @@ function openSideBar(e) {
   var body = message.getPlainBody();
   var messageDate = message.getDate();
 
+  var staticjson = {
+    contacts: {
+      contact1: {
+        name: "test 1",
+        email: "test1@test.nl"
+      },
+      contact2: {
+        name: "test 2",
+        email: "test2@test.nl"
+      }
+    },
+    deals: {
+      deal1: {
+        title: "title1",
+        content: "some content"
+      },
+      deal2: {
+        title: "title2",
+        content: "some content"
+      }
+    },
+    appointments: {
+      appointment1: {
+        date: "10-2-2019",
+        content: "A birthday!"
+      },
+      appointment2: {
+        date: "18-1-2019",
+        content: "oplevering"
+      }
+    },
+    tickets: {
+      ticket1: {
+        title: "ticket1",
+        content: "some content"
+      },
+      ticket2: {
+        title: "ticket2",
+        content: "some content"
+      }
+    }
+  }
+
 
   // Test send email to API
   var url = "https://hp-tests.herokuapp.com/api/email";
@@ -62,49 +105,40 @@ function openSideBar(e) {
       // Deals
       .addSection(
         CardService.newCardSection()
-        .setHeader('DEALS')
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Deal A")
-          .setContent("Over 3 weken")
-        )
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Deal B")
-          .setContent("Over 2 weken")
-        )
+        .setHeader('DEALS'),
+        staticjson.deals.forEach(deal => {
+          addWidget(
+            CardService.newKeyValue()
+            .setTopLabel(deal.title)
+            .setContent(deal.content)
+          )
+        })
       )
 
       // Appointments
       .addSection(
         CardService.newCardSection()
-        .setHeader('AFSPRAKEN')
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("12 januari | 12:00 - 13:00")
-          .setContent("Fingersplitz Room")
-        )
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("14 januari | 16:00 - 17:00")
-          .setContent("Fingersplitz Room")
-        )
+        .setHeader('AFSPRAKEN'),
+        staticjson.appointments.forEach(appointment => {
+          addWidget(
+            CardService.newKeyValue()
+            .setTopLabel(appointment.date)
+            .setContent(appointment.content)
+          )
+        })
       )
 
       // Tickets
       .addSection(
         CardService.newCardSection()
-        .setHeader('TICKETS')
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Ticket #0001")
-          .setContent(senderName)
-        )
-        .addWidget(
-          CardService.newKeyValue()
-          .setTopLabel("Ticket #0017")
-          .setContent(senderName)
-        )
+        .setHeader('TICKETS'),
+        staticjson.tickets.forEach(ticket => {
+          addWidget(
+            CardService.newKeyValue()
+            .setTopLabel(ticket.title)
+            .setContent(ticket.content)
+          )
+        })
       )
       .build();
   }
