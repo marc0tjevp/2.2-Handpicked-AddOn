@@ -19,3 +19,7 @@ var server = app.listen(port, function () {
     var port = server.address().port
     console.log("Express: Port " + port)
 })
+
+module.exports = {
+    server
+  }

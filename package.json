@@ -4,7 +4,8 @@
   "description": "API for the Gmail Addon to interact with the .NET API",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
+    "posttest": "node tests.js",
     "start": "node server.js"
   },
   "repository": {
@@ -20,7 +21,10 @@
   "dependencies": {
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
     "express": "^4.16.4",
+    "mocha": "^5.2.0",
     "mongoose": "^5.4.0",
     "morgan": "^1.9.1"
   }
