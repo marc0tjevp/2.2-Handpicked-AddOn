@@ -78,6 +78,10 @@ function openSideBar(e) {
   // Empty action for button
   var action = CardService.newAction().setFunctionName('notificationCallback');
 
+  function handleDropDownChange(){
+    console.log('Changed dropdown')
+  }
+
   function createContactOverview() {
     var cardMailOverview = CardService.newCardBuilder()
     .setName("Contact Overview")
@@ -99,7 +103,31 @@ function openSideBar(e) {
       .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(action))
     );
 
-    return cardMailOverview.addSection(contactSection).build();
+    // Domain section
+    var domainName = CardService.newCardSection();
+
+    domainName.setHeader('ING Corporation');      
+
+    //If staticjson.domain != null
+    domainName.addWidget(CardService.newKeyValue()
+      .setTopLabel('ING')
+      .setContent('Blabla, side corp of ING'));
+    //else
+    var dropdownGroup = CardService.newSelectionInput()
+    .setType(CardService.SelectionInputType.DROPDOWN)
+    .setTitle("Dropdown if no domain")
+    .setFieldName("TestFieldName")
+    .addItem("","value_empty",true)
+    .addItem("ING","value_one",false)
+    .addItem("RABOBANK", "value_two",false)
+    .addItem("ABN-AMRO", "value_three",false);
+
+    domainName.addWidget(dropdownGroup);
+    //Save the new domain reference
+    domainName.addWidget(CardService.newButtonSet()
+    .addButton(CardService.newTextButton().setText('Save new domain').setOnClickAction(action)))
+
+    return cardMailOverview.addSection(contactSection).addSection(domainName).build();
   }
 
   function createDealOverview() {
@@ -210,8 +238,7 @@ function openSideBar(e) {
     createContactOverview(),
     createDealOverview(),
     createDealOverview(),
-    createTicketOverview(),
-    createDomainOverview()
+    createTicketOverview()
   ]
 
 }
