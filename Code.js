@@ -195,9 +195,9 @@ function openSideBar(e) {
     .setType(CardService.SelectionInputType.DROPDOWN)
     .setTitle("Dropdown if there customer is not connector to domain")
     .setFieldName("TestFieldName")
-    .addItem("ING", false)
-    .addItem("RABOBANK", true)
-    .addItem("ABN-AMRO", false)
+    .addItem("ING","value_one",false)
+    .addItem("RABOBANK", "value_two",true)
+    .addItem("ABN-AMRO", "value_three",false)
     .setOnChangeAction(CardService.newAction()
         .setFunctionName("handleCheckboxChange"));
 
@@ -210,7 +210,8 @@ function openSideBar(e) {
     createContactOverview(),
     createDealOverview(),
     createDealOverview(),
-    createTicketOverview()
+    createTicketOverview(),
+    createDomainOverview()
   ]
 
 }
