@@ -23,7 +23,7 @@ describe('Example', () => {
 
     it('Should get status 200 when getting data', done => {
         chai.request(server)
-            .get('/api/example')
+            .get('/api/addon/marc0tjevp@gmail.com')
             .end((err, res) => {
                 res.should.have.status(200)
                 res.should.be.json
