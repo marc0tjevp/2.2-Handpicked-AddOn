@@ -14,8 +14,7 @@ function openSideBar(e) {
   var messageDate = message.getDate();
 
   var staticjson = {
-    contacts: [
-      {
+    contacts: [{
         name: "test 1",
         email: "test1@test.nl"
       },
@@ -24,8 +23,7 @@ function openSideBar(e) {
         email: "test2@test.nl"
       }
     ],
-    deals: [
-      {
+    deals: [{
         title: "title1",
         content: "some content"
       },
@@ -34,8 +32,7 @@ function openSideBar(e) {
         content: "some content"
       }
     ],
-    appointments: [
-      {
+    appointments: [{
         date: "10-2-2019",
         content: "A birthday!"
       },
@@ -44,8 +41,7 @@ function openSideBar(e) {
         content: "oplevering"
       }
     ],
-    tickets: [
-      {
+    tickets: [{
         title: "ticket1",
         content: "some content"
       },
@@ -64,27 +60,34 @@ function openSideBar(e) {
     "name": senderName,
     "subject": subject,
     "body": body,
-    "date": messageDate 
+    "date": messageDate
   }
   var options = {
     "method": "post",
-    "contentType" : "application/json",
+    "contentType": "application/json",
     "payload": JSON.stringify(data)
   };
   var response = UrlFetchApp.fetch(url, options);
+
+  //temp API data
+  var tempApiResponse = UrlFetchApp.fetch("https://angularapigame.herokuapp.com/api/testUser", {'muteHttpExceptions': true});
 
   console.log(response)
 
   // Empty action for button
   var action = CardService.newAction().setFunctionName('notificationCallback');
 
+  function handleDropDownChange() {
+    console.log('Changed dropdown')
+  }
+
   function createContactOverview() {
     var cardMailOverview = CardService.newCardBuilder()
-    .setName("Contact Overview")
-    .setHeader(
-      CardService.newCardHeader()
-      .setTitle('Contacts')
-    );
+      .setName("Contact Overview")
+      .setHeader(
+        CardService.newCardHeader()
+        .setTitle('Contacts')
+      );
 
     // Contacts Section
     var contactSection = CardService.newCardSection();
@@ -99,22 +102,46 @@ function openSideBar(e) {
       .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(action))
     );
 
-    return cardMailOverview.addSection(contactSection).build();
+    // Domain section
+    var domainName = CardService.newCardSection();
+
+    domainName.setHeader('ING Corporation');
+
+    //If staticjson.domain != null
+    domainName.addWidget(CardService.newKeyValue()
+      .setTopLabel('ING')
+      .setContent('Blabla, side corp of ING'));
+    //else
+    var dropdownGroup = CardService.newSelectionInput()
+      .setType(CardService.SelectionInputType.DROPDOWN)
+      .setTitle("Dropdown if no domain")
+      .setFieldName("TestFieldName")
+      .addItem("", "value_empty", true)
+      .addItem("ING", "value_one", false)
+      .addItem("RABOBANK", "value_two", false)
+      .addItem("ABN-AMRO", "value_three", false);
+
+    domainName.addWidget(dropdownGroup);
+    //Save the new domain reference
+    domainName.addWidget(CardService.newButtonSet()
+      .addButton(CardService.newTextButton().setText('Save new domain').setOnClickAction(action)))
+
+    return cardMailOverview.addSection(contactSection).addSection(domainName).build();
   }
 
   function createDealOverview() {
     var cardMailOverview = CardService.newCardBuilder()
-    .setName("Deal Overview")
-    .setHeader(
-      CardService.newCardHeader()
-      .setTitle('Deals')
-    );
+      .setName("Deal Overview")
+      .setHeader(
+        CardService.newCardHeader()
+        .setTitle('Deals')
+      );
 
     // Deals Section
     var dealSection = CardService.newCardSection();
 
     dealSection.setHeader('DEALS');
-    staticjson.deals.forEach(function(deal) {
+    staticjson.deals.forEach(function (deal) {
       dealSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(deal.title)
@@ -127,18 +154,18 @@ function openSideBar(e) {
 
   function createAppointmentOverview() {
     var cardMailOverview = CardService.newCardBuilder()
-    .setName("Appointment Overview")
-    .setHeader(
-      CardService.newCardHeader()
-      .setTitle('Appointments')
-    );
+      .setName("Appointment Overview")
+      .setHeader(
+        CardService.newCardHeader()
+        .setTitle('Appointments')
+      );
 
     // Appointments Section
     var appointmentSection = CardService.newCardSection();
 
     appointmentSection.setHeader('AFSPRAKEN');
 
-    staticjson.appointments.forEach(function(appointment) {
+    staticjson.appointments.forEach(function (appointment) {
       appointmentSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(appointment.date)
@@ -151,18 +178,18 @@ function openSideBar(e) {
 
   function createTicketOverview() {
     var cardMailOverview = CardService.newCardBuilder()
-    .setName("Ticket Overview")
-    .setHeader(
-      CardService.newCardHeader()
-      .setTitle('Tickets')
-    );
+      .setName("Ticket Overview")
+      .setHeader(
+        CardService.newCardHeader()
+        .setTitle('Tickets')
+      );
 
     // Tickets Section
     var ticketSection = CardService.newCardSection();
 
     ticketSection.setHeader('TICKETS');
-      
-    staticjson.tickets.forEach(function(ticket) {
+
+    staticjson.tickets.forEach(function (ticket) {
       ticketSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(ticket.title)
@@ -173,11 +200,50 @@ function openSideBar(e) {
     return cardMailOverview.addSection(ticketSection).build();
   }
 
+  //Check if customer is connected to a domain, else select one???
+  function createTestOverview() {
+    var json = tempApiResponse.getContentText();
+    var data = JSON.parse(json);
+    console.log(data+'<<<DATA')
+
+    var cardMailOverview = CardService.newCardBuilder()
+      .setName("Test Overview")
+      .setHeader(
+        CardService.newCardHeader()
+        .setTitle('TestOverView')
+      );
+
+    var domainName = CardService.newCardSection();
+
+    domainName.setHeader(sender);
+
+    if (data.Email == sender) {
+      domainName.addWidget(CardService.newKeyValue()
+        .setTopLabel('Domain: ING')
+        .setContent(sender +' Is regocnized in the system!'));
+    } else {
+      //else
+      var dropdownGroup = CardService.newSelectionInput()
+        .setType(CardService.SelectionInputType.DROPDOWN)
+        .setTitle("Select domain for user")
+        .setFieldName("TestFieldName")
+        .addItem("", "value_empty", true)
+        .addItem("ING", "value_one", false)
+        .addItem("RABOBANK", "value_two", false)
+        .addItem("ABN-AMRO", "value_three", false);
+
+      domainName.addWidget(dropdownGroup);
+    }
+
+    return cardMailOverview.addSection(domainName).build();
+  }
+
   return [
     createContactOverview(),
     createDealOverview(),
     createDealOverview(),
-    createTicketOverview()
+    createTicketOverview(),
+    createTestOverview()
   ]
 
 }
