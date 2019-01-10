@@ -19,34 +19,24 @@ function openSideBar(e) {
 
   // Static mock data
   var staticjson = {
-    deals: [{
-        title: "title1",
-        content: "some content"
-      },
-      {
-        title: "title2",
-        content: "some content"
-      }
-    ],
     appointments: [{
-        date: "10-2-2019",
-        content: "A birthday!"
+        date: "12 januari | 12:00 - 13:00",
+        content: "LD121"
       },
       {
-        date: "18-1-2019",
-        content: "oplevering"
+        date: "14 januari | 09:15 - 12:00",
+        content: "LA201"
       }
     ],
     tickets: [{
-        title: "ticket1",
-        content: "some content"
-      },
-      {
-        title: "ticket2",
-        content: "some content"
+        title: "Ticket #102030",
+        content: "Robin Schellius"
       }
     ]
   }
+
+  // Actions
+  var action = CardService.newAction().setFunctionName('notificationCallback');
 
   // Construct Card
   var card = CardService.newCardBuilder()
@@ -61,8 +51,10 @@ function openSideBar(e) {
     data.result.contacts.forEach(function (contact) {
       contactSection.addWidget(
         CardService.newKeyValue()
-        .setIconUrl('https://png.pngtree.com/svg/20161230/little_helper_657605.png')
-        .setContent(contact.name)
+        .setIcon(CardService.Icon.PERSON)
+        .setTopLabel(contact.name)
+        .setContent(contact.email)
+        .setOnClickAction(CardService.newAction().setFunctionName("contactDetail").setParameters(contact))
       );
     });
 
@@ -74,56 +66,60 @@ function openSideBar(e) {
 
     // Domain section
     var domainName = CardService.newCardSection();
-    domainName.setHeader(data.result.company.name);
-    if (data.result.company) {
+    if (Object.keys(data.result.company.domains).length > 0) {
+      domainName.setHeader(data.result.company.name);
       data.result.company.domains.forEach(function (domain) {
         domainName.addWidget(CardService.newKeyValue()
           .setTopLabel('Domain')
+          .setIcon(CardService.Icon.EMAIL)
           .setContent(domain));
       });
     } else {
+      domainName.setHeader("Onbekend Bedrijf");
       var dropdownGroup = CardService.newSelectionInput()
         .setType(CardService.SelectionInputType.DROPDOWN)
-        .setTitle("Dropdown if no domain")
+        .setTitle("Dit domein aan bedrijf koppelen")
         .setFieldName("TestFieldName")
-        .addItem("", "value_empty", true)
         .addItem("ING", "value_one", false)
         .addItem("RABOBANK", "value_two", false)
         .addItem("ABN-AMRO", "value_three", false);
       domainName.addWidget(dropdownGroup);
       domainName.addWidget(CardService.newButtonSet()
-        .addButton(CardService.newTextButton().setText('Save new domain').setOnClickAction(action)))
+        .addButton(CardService.newTextButton().setText('Opslaan')))
     }
 
     // Deals
     var dealSection = CardService.newCardSection();
     dealSection.setHeader('Deals');
-    staticjson.deals.forEach(function (deal) {
+    data.result.deals.forEach(function (deal) {
       dealSection.addWidget(
         CardService.newKeyValue()
-        .setTopLabel(deal.title)
-        .setContent(deal.content)
+        .setTopLabel(deal.name)
+        .setIcon(CardService.Icon.DOLLAR)
+        .setContent(deal.deadline)
       );
     });
 
     // Appointments
     var appointmentSection = CardService.newCardSection();
-    appointmentSection.setHeader('Afspraken');
+    appointmentSection.setHeader('Afspraken (static)');
     staticjson.appointments.forEach(function (appointment) {
       appointmentSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(appointment.date)
+        .setIcon(CardService.Icon.INVITE)
         .setContent(appointment.content)
       );
     });
 
     // Tickets
     var ticketSection = CardService.newCardSection();
-    ticketSection.setHeader('Tickets');
+    ticketSection.setHeader('Tickets (static)');
     staticjson.tickets.forEach(function (ticket) {
       ticketSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(ticket.title)
+        .setIcon(CardService.Icon.TICKET)
         .setContent(ticket.content)
       );
     });
@@ -133,15 +129,40 @@ function openSideBar(e) {
 
   }
 
-  // Actions
-  var action = CardService.newAction().setFunctionName('notificationCallback');
-
-  function handleDropDownChange() {
-    console.log('Changed dropdown')
-  }
-
   return [
     createContactOverview()
   ]
 
+}
+
+// Contact Details
+function contactDetail(e) {
+
+  var card = CardService.newCardBuilder()
+    .setName("Contact Overview")
+
+  var details = CardService.newCardSection();
+  details.addWidget(
+    CardService.newImage().setAltText("Avatar").setImageUrl("https://via.placeholder.com/512x260")
+  )
+  details.addWidget(
+    CardService.newKeyValue()
+    .setTopLabel("Naam")
+    .setIcon(CardService.Icon.PERSON)
+    .setContent(e.parameters.name)
+  );
+  details.addWidget(
+    CardService.newKeyValue()
+    .setTopLabel("Email")
+    .setIcon(CardService.Icon.EMAIL)
+    .setContent(e.parameters.email)
+  );
+  details.addWidget(
+    CardService.newKeyValue()
+    .setTopLabel("Telefoon")
+    .setIcon(CardService.Icon.PHONE)
+    .setContent(e.parameters.telephone)
+  );
+
+  return card.addSection(details).build();
 }
