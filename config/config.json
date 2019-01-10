@@ -1,5 +1,6 @@
 {
     "port": 8080,
+    "apikey": "TxIlqeLRqaUgBCgYagtFtDiOpLLmUCbuEiokvcOuvIvPbUBmgmlnWyMCAegQFKia",
     "databases": {
         "mongo": "mongodb://localhost/handpicked",
         "mongo-test": "mongodb://localhost/handpicked_test"
