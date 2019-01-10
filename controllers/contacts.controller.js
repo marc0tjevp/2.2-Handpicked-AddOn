@@ -28,16 +28,33 @@ let mock = (req, res) => {
                 "student.avans.nl"
             ]
         },
-        "contacts": [
-            {
+        "contacts": [{
                 "email": "rschellius@avans.nl",
-                "name": "Robin Schellius"
+                "name": "Robin Schellius",
+                "function": "Leraar",
+                "telephone": "0612345678"
             },
             {
                 "email": "gdevaan@avans.nl",
-                "name": "Gitta de Vaan"
+                "name": "Gitta de Vaan",
+                "function": "Leraar",
+                "telephone": "0612345678"
             }
-        ]
+        ],
+        "deals": [{
+                "name": "Project met Handpicked Agencies",
+                "deadline": "17-01-2018",
+                "startdate": "24-12-2017",
+                "percentage": "50%"
+            },
+            {
+                "name": "Project met CM",
+                "deadline": "18-01-2018",
+                "startdate": "24-12-2017",
+                "percentage": "90%"
+
+            }
+        ],
     }
 
     res.status(200).json({
