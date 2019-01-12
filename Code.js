@@ -7,96 +7,58 @@ function openSideBar(e) {
   // Email Data
   var messageId = e.messageMetadata.messageId;
   var message = GmailApp.getMessageById(messageId);
-  var senderName = message.getFrom();
   var sender = message.getFrom().replace(/^.+<([^>]+)>$/, "$1");
-  var subject = message.getSubject();
-  var body = message.getPlainBody();
-  var messageDate = message.getDate();
 
+  // Mock Endpoint
+  var endpoint = "https://hp-develop.herokuapp.com/api/contacts/" + sender;
+  var response = UrlFetchApp.fetch(endpoint, {
+    'muteHttpExceptions': true
+  });
+  var json = response.getContentText();
+  var data = JSON.parse(json);
+
+  // Static mock data
   var staticjson = {
-    contacts: [{
-        name: "test 1",
-        email: "test1@test.nl"
-      },
-      {
-        name: "test 2",
-        email: "test2@test.nl"
-      }
-    ],
-    deals: [{
-        title: "title1",
-        content: "some content"
-      },
-      {
-        title: "title2",
-        content: "some content"
-      }
-    ],
     appointments: [{
-        date: "10-2-2019",
-        content: "A birthday!"
+        date: "12 januari | 12:00 - 13:00",
+        content: "LD121"
       },
       {
-        date: "18-1-2019",
-        content: "oplevering"
+        date: "14 januari | 09:15 - 12:00",
+        content: "LA201"
       }
     ],
     tickets: [{
-        title: "ticket1",
-        content: "some content"
-      },
-      {
-        title: "ticket2",
-        content: "some content"
+        title: "Ticket #102030",
+        content: "Robin Schellius"
       }
     ]
   }
 
-  // Test send email to API
-  var url = "https://hp-tests.herokuapp.com/api/email";
-  var data = {
-    "id": message,
-    "sender": sender,
-    "name": senderName,
-    "subject": subject,
-    "body": body,
-    "date": messageDate
-  }
-  var options = {
-    "method": "post",
-    "contentType": "application/json",
-    "payload": JSON.stringify(data)
-  };
-  var response = UrlFetchApp.fetch(url, options);
-
-  //temp API data
-  var tempApiResponse = UrlFetchApp.fetch("https://angularapigame.herokuapp.com/api/testUser", {'muteHttpExceptions': true});
-
-  console.log(response)
-
-  // Empty action for button
+  // Actions
   var action = CardService.newAction().setFunctionName('notificationCallback');
 
-  function handleDropDownChange() {
-    console.log('Changed dropdown')
-  }
+  // Construct Card
+  var card = CardService.newCardBuilder()
+    .setName("Sidebar Overview")
 
+  // Construct Sections
   function createContactOverview() {
-    var cardMailOverview = CardService.newCardBuilder()
-      .setName("Contact Overview")
-      .setHeader(
-        CardService.newCardHeader()
-        .setTitle('Contacts')
-      );
 
     // Contacts Section
     var contactSection = CardService.newCardSection();
+    contactSection.setHeader('Contactpersonen');
+    data.result.contacts.forEach(function (contact) {
+      contactSection.addWidget(
+        CardService.newKeyValue()
+        .setIcon(CardService.Icon.PERSON)
+        .setTopLabel(contact.name)
+        .setContent(contact.email)
+        .setOnClickAction(CardService.newAction().setFunctionName("contactDetail").setParameters(contact))
+      );
+    });
 
-    contactSection.setHeader('CONTACTPERSONEN');
-    contactSection.addWidget(CardService.newKeyValue()
-      .setIconUrl('https://png.pngtree.com/svg/20161230/little_helper_657605.png')
-      .setContent(sender)
-    );
+    // Contacts buttonset
     contactSection.addWidget(CardService.newButtonSet()
       .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
       .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(action))
@@ -104,146 +66,103 @@ function openSideBar(e) {
 
     // Domain section
     var domainName = CardService.newCardSection();
+    if (Object.keys(data.result.company.domains).length > 0) {
+      domainName.setHeader(data.result.company.name);
+      data.result.company.domains.forEach(function (domain) {
+        domainName.addWidget(CardService.newKeyValue()
+          .setTopLabel('Domain')
+          .setIcon(CardService.Icon.EMAIL)
+          .setContent(domain));
+      });
+    } else {
+      domainName.setHeader("Onbekend Bedrijf");
+      var dropdownGroup = CardService.newSelectionInput()
+        .setType(CardService.SelectionInputType.DROPDOWN)
+        .setTitle("Dit domein aan bedrijf koppelen")
+        .setFieldName("TestFieldName")
+        .addItem("ING", "value_one", false)
+        .addItem("RABOBANK", "value_two", false)
+        .addItem("ABN-AMRO", "value_three", false);
+      domainName.addWidget(dropdownGroup);
+      domainName.addWidget(CardService.newButtonSet()
+        .addButton(CardService.newTextButton().setText('Opslaan')))
+    }
 
-    domainName.setHeader('ING Corporation');
-
-    //If staticjson.domain != null
-    domainName.addWidget(CardService.newKeyValue()
-      .setTopLabel('ING')
-      .setContent('Blabla, side corp of ING'));
-    //else
-    var dropdownGroup = CardService.newSelectionInput()
-      .setType(CardService.SelectionInputType.DROPDOWN)
-      .setTitle("Dropdown if no domain")
-      .setFieldName("TestFieldName")
-      .addItem("", "value_empty", true)
-      .addItem("ING", "value_one", false)
-      .addItem("RABOBANK", "value_two", false)
-      .addItem("ABN-AMRO", "value_three", false);
-
-    domainName.addWidget(dropdownGroup);
-    //Save the new domain reference
-    domainName.addWidget(CardService.newButtonSet()
-      .addButton(CardService.newTextButton().setText('Save new domain').setOnClickAction(action)))
-
-    return cardMailOverview.addSection(contactSection).addSection(domainName).build();
-  }
-
-  function createDealOverview() {
-    var cardMailOverview = CardService.newCardBuilder()
-      .setName("Deal Overview")
-      .setHeader(
-        CardService.newCardHeader()
-        .setTitle('Deals')
-      );
-
-    // Deals Section
+    // Deals
     var dealSection = CardService.newCardSection();
-
-    dealSection.setHeader('DEALS');
-    staticjson.deals.forEach(function (deal) {
+    dealSection.setHeader('Deals');
+    data.result.deals.forEach(function (deal) {
       dealSection.addWidget(
         CardService.newKeyValue()
-        .setTopLabel(deal.title)
-        .setContent(deal.content)
+        .setTopLabel(deal.name)
+        .setIcon(CardService.Icon.DOLLAR)
+        .setContent(deal.deadline)
       );
     });
 
-    return cardMailOverview.addSection(dealSection).build();
-  }
-
-  function createAppointmentOverview() {
-    var cardMailOverview = CardService.newCardBuilder()
-      .setName("Appointment Overview")
-      .setHeader(
-        CardService.newCardHeader()
-        .setTitle('Appointments')
-      );
-
-    // Appointments Section
+    // Appointments
     var appointmentSection = CardService.newCardSection();
-
-    appointmentSection.setHeader('AFSPRAKEN');
-
+    appointmentSection.setHeader('Afspraken (static)');
     staticjson.appointments.forEach(function (appointment) {
       appointmentSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(appointment.date)
+        .setIcon(CardService.Icon.INVITE)
         .setContent(appointment.content)
       );
     });
 
-    return cardMailOverview.addSection(appointmentSection).build();
-  }
-
-  function createTicketOverview() {
-    var cardMailOverview = CardService.newCardBuilder()
-      .setName("Ticket Overview")
-      .setHeader(
-        CardService.newCardHeader()
-        .setTitle('Tickets')
-      );
-
-    // Tickets Section
+    // Tickets
     var ticketSection = CardService.newCardSection();
-
-    ticketSection.setHeader('TICKETS');
-
+    ticketSection.setHeader('Tickets (static)');
     staticjson.tickets.forEach(function (ticket) {
       ticketSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(ticket.title)
+        .setIcon(CardService.Icon.TICKET)
         .setContent(ticket.content)
       );
     });
 
-    return cardMailOverview.addSection(ticketSection).build();
-  }
+    // Build card
+    return card.addSection(domainName).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
 
-  //Check if customer is connected to a domain, else select one???
-  function createTestOverview() {
-    var json = tempApiResponse.getContentText();
-    var data = JSON.parse(json);
-    console.log(data+'<<<DATA')
-
-    var cardMailOverview = CardService.newCardBuilder()
-      .setName("Test Overview")
-      .setHeader(
-        CardService.newCardHeader()
-        .setTitle('TestOverView')
-      );
-
-    var domainName = CardService.newCardSection();
-
-    domainName.setHeader(sender);
-
-    if (data.Email == sender) {
-      domainName.addWidget(CardService.newKeyValue()
-        .setTopLabel('Domain: ING')
-        .setContent(sender +' Is regocnized in the system!'));
-    } else {
-      //else
-      var dropdownGroup = CardService.newSelectionInput()
-        .setType(CardService.SelectionInputType.DROPDOWN)
-        .setTitle("Select domain for user")
-        .setFieldName("TestFieldName")
-        .addItem("", "value_empty", true)
-        .addItem("ING", "value_one", false)
-        .addItem("RABOBANK", "value_two", false)
-        .addItem("ABN-AMRO", "value_three", false);
-
-      domainName.addWidget(dropdownGroup);
-    }
-
-    return cardMailOverview.addSection(domainName).build();
   }
 
   return [
-    createContactOverview(),
-    createDealOverview(),
-    createDealOverview(),
-    createTicketOverview(),
-    createTestOverview()
+    createContactOverview()
   ]
 
+}
+
+// Contact Details
+function contactDetail(e) {
+
+  var card = CardService.newCardBuilder()
+    .setName("Contact Overview")
+
+  var details = CardService.newCardSection();
+  details.addWidget(
+    CardService.newImage().setAltText("Avatar").setImageUrl("https://via.placeholder.com/512x260")
+  )
+  details.addWidget(
+    CardService.newKeyValue()
+    .setTopLabel("Naam")
+    .setIcon(CardService.Icon.PERSON)
+    .setContent(e.parameters.name)
+  );
+  details.addWidget(
+    CardService.newKeyValue()
+    .setTopLabel("Email")
+    .setIcon(CardService.Icon.EMAIL)
+    .setContent(e.parameters.email)
+  );
+  details.addWidget(
+    CardService.newKeyValue()
+    .setTopLabel("Telefoon")
+    .setIcon(CardService.Icon.PHONE)
+    .setContent(e.parameters.telephone)
+  );
+
+  return card.addSection(details).build();
 }
