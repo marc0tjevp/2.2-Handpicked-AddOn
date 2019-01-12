@@ -7,7 +7,7 @@ let get = (req, res) => {
     // FIXME: Get all contacts OR get contacts by email?
 
     // Get All companies, poc
-    request('get', 'http://handpicked.post-tech.nl:5000/api/Companies', {}, (companies) => {
+    request('get', 'http://handpicked.post-tech.nl:5000/api/Contacts/?email=' + email, {}, (companies) => {
         res.status(200).json({
             query: email,
             companies,
@@ -23,6 +23,7 @@ let mock = (req, res) => {
     let result = {
         "company": {
             "name": "Avans Hogeschool",
+            "slack": "avans",
             "domains": [
                 "avans.nl",
                 "student.avans.nl"
