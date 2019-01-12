@@ -23,7 +23,7 @@ let mock = (req, res) => {
     let result = {
         "company": {
             "name": "Avans Hogeschool",
-            "slack": "avans",
+            "slack": "offtopic",
             "domains": [
                 "avans.nl",
                 "student.avans.nl"
