@@ -37,7 +37,8 @@ function openSideBar(e) {
 
   // Actions
   var action = CardService.newAction().setFunctionName('notificationCallback');
-  var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({"channel": data.result.company.slack});
+  var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({"channel": data.company.slack});
+  var saveSlackChannel =  CardService.newAction().setFunctionName('saveSlackChannel');
 
 
   // Construct Card
@@ -50,7 +51,7 @@ function openSideBar(e) {
     // Contacts Section
     var contactSection = CardService.newCardSection();
     contactSection.setHeader('Contactpersonen');
-    data.result.contacts.forEach(function (contact) {
+    data.contacts.forEach(function (contact) {
       contactSection.addWidget(
         CardService.newKeyValue()
         .setIcon(CardService.Icon.PERSON)
@@ -60,17 +61,34 @@ function openSideBar(e) {
       );
     });
 
-    // Contacts buttonset
-    contactSection.addWidget(CardService.newButtonSet()
-      .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
-      .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
-    );
+    // Contacts buttonset/ Slack input
+    if (data.company.slack.length > 0) {
+      contactSection.addWidget(CardService.newButtonSet()
+        .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
+        .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
+      );
+      } else {
+        contactSection.addWidget(CardService.newButtonSet()
+        .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
+      );
+
+      var slackChannel = CardService.newTextInput()
+        .setFieldName("channel")
+        .setTitle("Slack channel name:")
+        .setHint("General");
+        
+      contactSection.addWidget(slackChannel);
+      contactSection.addButton(CardService.newButtonSet()
+      .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
+      );
+      }
+
 
     // Domain section
     var domainName = CardService.newCardSection();
-    if (Object.keys(data.result.company.domains).length > 0) {
-      domainName.setHeader(data.result.company.name);
-      data.result.company.domains.forEach(function (domain) {
+    if (Object.keys(data.company.domains).length > 0) {
+      domainName.setHeader(data.company.name);
+      data.company.domains.forEach(function (domain) {
         domainName.addWidget(CardService.newKeyValue()
           .setTopLabel('Domain')
           .setIcon(CardService.Icon.EMAIL)
@@ -93,7 +111,7 @@ function openSideBar(e) {
     // Deals
     var dealSection = CardService.newCardSection();
     dealSection.setHeader('Deals');
-    data.result.deals.forEach(function (deal) {
+    data.deals.forEach(function (deal) {
       dealSection.addWidget(
         CardService.newKeyValue()
         .setTopLabel(deal.name)
@@ -177,4 +195,8 @@ function openSlackLink(e) {
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
   .build();
+}
+
+function saveSlackChannel() {
+
 }
