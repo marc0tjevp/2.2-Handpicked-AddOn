@@ -36,12 +36,12 @@ let post = (req,res)=>{
     //department
 
     request('post','http://handpicked.post-tech.nl:5000/api/Contacts',{
-        "originalId": "PlaceHolderID",
-        "companyId": req.companyId,
-        "name": req.name,
-        "email": req.email,
-        "phoneNr": req.phoneNr,
-        "department": req.department
+        OriginalId: req.body.originalId,
+        CompanyId: req.body.companyId,
+        Name: req.body.name,
+        Email: req.body.email,
+        PhoneNr: req.body.phoneNr,
+        Department: req.body.department
     },(data) => {
         (res.status(200).json(data).end())
     })
