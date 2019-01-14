@@ -16,6 +16,26 @@ let get = (req, res) => {
 
 }
 
+let post = (req,res)=>{
+    //id
+    //company
+    //name
+    //email
+    //phoneNr
+    //department
+
+    request('post','http://handpicked.post-tech.nl:5000/api/Contacts',{
+        "originalId": "PlaceHolderID",
+        "companyId": req.companyId,
+        "name": req.name,
+        "email": req.email,
+        "phoneNr": req.phoneNr,
+        "department": req.department
+    },(data) => {
+        (res.status(200).json(data).end())
+    })
+}
+
 let mock = (req, res) => {
 
     let email = req.params.email || ''
@@ -67,5 +87,6 @@ let mock = (req, res) => {
 
 module.exports = {
     get,
-    mock
+    mock,
+    post
 }
