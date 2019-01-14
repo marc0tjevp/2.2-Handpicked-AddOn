@@ -86,7 +86,7 @@ function openSideBar(e) {
         .setHint("General");
 
       contactSection.addWidget(slackChannel);
-      contactSection.addButton(CardService.newButtonSet()
+      contactSection.addWidget(CardService.newButtonSet()
         .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
       );
     }
