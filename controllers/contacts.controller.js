@@ -4,13 +4,22 @@ let get = (req, res) => {
 
     let email = req.params.email || ''
 
-    // FIXME: Get all contacts OR get contacts by email?
-
     // Get All companies, poc
-    request('get', 'http://handpicked.post-tech.nl:5000/api/Contacts/?email=' + email, {}, (companies) => {
+    request('get', 'http://handpicked.post-tech.nl:5000/api/Contacts?email=' + email, {}, (result) => {
         res.status(200).json({
-            query: email,
-            companies,
+            company: {
+                id: result.company.companyId,
+                name: result.company.name,
+                label: result.company.label
+            },
+            contact: {
+                id: result.contactId,
+                name: result.name,
+                email: result.email,
+                phone: result.phoneNr,
+                department: result.department
+            },
+            deals: result.deals
         }).end()
     })
 
