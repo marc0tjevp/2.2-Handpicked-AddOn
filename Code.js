@@ -10,7 +10,8 @@ function openSideBar(e) {
   var sender = message.getFrom().replace(/^.+<([^>]+)>$/, "$1");
 
   // Mock Endpoint
-  var endpoint = "https://hp-develop.herokuapp.com/api/contacts/" + sender;
+  var endpoint = "https://hp-develop.herokuapp.com/api/contacts/Brian.Hendriks@Vink.nl"
+  //"https://hp-develop.herokuapp.com/api/contacts/" + sender;
   var response = UrlFetchApp.fetch(endpoint, {
     'muteHttpExceptions': true
   });
@@ -82,7 +83,6 @@ function openSideBar(e) {
       .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
       );
       }
-
 
     // Domain section
     var domainName = CardService.newCardSection();
