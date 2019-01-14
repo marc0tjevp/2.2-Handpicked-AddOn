@@ -31,19 +31,19 @@ let get = (req, res) => {
                         originalId: result.company.originalId,
                         label: result.company.label
                     },
-                    contact: {
+                    contacts: [{
                         id: result.contactId,
                         name: result.name,
                         email: result.email,
                         phone: result.phoneNr,
                         department: result.department
-                    },
+                    }],
                     deals: result.deals
                 }).end()
 
             })
-        } 
-        
+        }
+
         // If no result
         else {
             res.status(404).json({
