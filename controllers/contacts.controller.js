@@ -7,21 +7,40 @@ let get = (req, res) => {
 
     request('get', 'http://handpicked.post-tech.nl:5000/api/Contacts?email=' + email, {}, (result) => {
 
-        res.status(200).json({
-            company: {
-                id: result.company.companyId,
-                name: result.company.name,
-                label: result.company.label
-            },
-            contact: {
-                id: result.contactId,
-                name: result.name,
-                email: result.email,
-                phone: result.phoneNr,
-                department: result.department
-            },
-            deals: result.deals
-        }).end()
+        Company.findOne({
+            companyId: result.company.companyId
+        }, (err, c) => {
+
+            let channel = ''
+
+            if (c && c.slack) {
+                channel = c.slack
+            }
+
+            if (err) {
+                res.status(200).json(err).end()
+                return
+            }
+
+            res.status(200).json({
+                company: {
+                    id: result.company.companyId,
+                    name: result.company.name,
+                    slack: channel,
+                    originalId: result.company.originalId,
+                    label: result.company.label
+                },
+                contact: {
+                    id: result.contactId,
+                    name: result.name,
+                    email: result.email,
+                    phone: result.phoneNr,
+                    department: result.department
+                },
+                deals: result.deals
+            }).end()
+
+        })
 
     })
 
