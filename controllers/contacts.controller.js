@@ -1,11 +1,12 @@
 const request = require('../utils/request.util').doRequest
+const Company = require('../models/company.schema').Company
 
 let get = (req, res) => {
 
     let email = req.params.email || ''
 
-    // Get All companies, poc
     request('get', 'http://handpicked.post-tech.nl:5000/api/Contacts?email=' + email, {}, (result) => {
+
         res.status(200).json({
             company: {
                 id: result.company.companyId,
@@ -21,6 +22,7 @@ let get = (req, res) => {
             },
             deals: result.deals
         }).end()
+
     })
 
 }
