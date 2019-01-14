@@ -37,6 +37,8 @@ function openSideBar(e) {
 
   // Actions
   var action = CardService.newAction().setFunctionName('notificationCallback');
+  var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({"channel": data.result.company.slack});
+
 
   // Construct Card
   var card = CardService.newCardBuilder()
@@ -61,7 +63,7 @@ function openSideBar(e) {
     // Contacts buttonset
     contactSection.addWidget(CardService.newButtonSet()
       .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
-      .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(action))
+      .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
     );
 
     // Domain section
@@ -165,4 +167,14 @@ function contactDetail(e) {
   );
 
   return card.addSection(details).build();
+}
+
+//Action Functions
+function openSlackLink(e) {
+  return CardService.newActionResponseBuilder()
+  .setOpenLink(CardService.newOpenLink()
+      .setUrl("https://avansinformaticabreda.slack.com/messages/" +  e.parameters.channel)
+      .setOpenAs(CardService.OpenAs.FULL_SIZE)
+      .setOnClose(CardService.OnClose.NOTHING))
+  .build();
 }
