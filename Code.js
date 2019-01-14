@@ -30,16 +30,17 @@ function openSideBar(e) {
       }
     ],
     tickets: [{
-        title: "Ticket #102030",
-        content: "Robin Schellius"
-      }
-    ]
+      title: "Ticket #102030",
+      content: "Robin Schellius"
+    }]
   }
 
   // Actions
   var action = CardService.newAction().setFunctionName('notificationCallback');
-  var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({"channel": data.company.slack});
-  var saveSlackChannel =  CardService.newAction().setFunctionName('saveSlackChannel');
+  var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({
+    "channel": data.company.slack
+  });
+  var saveSlackChannel = CardService.newAction().setFunctionName('saveSlackChannel');
 
 
   // Construct Card
@@ -53,12 +54,18 @@ function openSideBar(e) {
     var contactSection = CardService.newCardSection();
     contactSection.setHeader('Contactpersonen');
     data.contacts.forEach(function (contact) {
+      var c = {
+        "name": contact.name,
+        "email": contact.email,
+        "phone": contact.phone,
+        "department": contact.department
+      }
       contactSection.addWidget(
         CardService.newKeyValue()
         .setIcon(CardService.Icon.PERSON)
         .setTopLabel(contact.name)
         .setContent(contact.email)
-        .setOnClickAction(CardService.newAction().setFunctionName("contactDetail").setParameters(contact))
+        .setOnClickAction(CardService.newAction().setFunctionName("contactDetail").setParameters(c))
       );
     });
 
@@ -68,8 +75,8 @@ function openSideBar(e) {
         .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
         .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
       );
-      } else {
-        contactSection.addWidget(CardService.newButtonSet()
+    } else {
+      contactSection.addWidget(CardService.newButtonSet()
         .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
       );
 
@@ -77,12 +84,12 @@ function openSideBar(e) {
         .setFieldName("channel")
         .setTitle("Slack channel name:")
         .setHint("General");
-        
+
       contactSection.addWidget(slackChannel);
       contactSection.addButton(CardService.newButtonSet()
-      .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
+        .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
       );
-      }
+    }
 
     // Domain section
     var domainName = CardService.newCardSection();
@@ -190,11 +197,11 @@ function contactDetail(e) {
 //Action Functions
 function openSlackLink(e) {
   return CardService.newActionResponseBuilder()
-  .setOpenLink(CardService.newOpenLink()
-      .setUrl("https://avansinformaticabreda.slack.com/messages/" +  e.parameters.channel)
+    .setOpenLink(CardService.newOpenLink()
+      .setUrl("https://avansinformaticabreda.slack.com/messages/" + e.parameters.channel)
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
-  .build();
+    .build();
 }
 
 function saveSlackChannel() {
