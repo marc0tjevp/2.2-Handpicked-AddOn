@@ -152,8 +152,8 @@ function openSideBar(e) {
         var title = event.getTitle();
         var times = event.getStartTime() + ' - ' + event.getEndTime() + event.getStartTime();
         times = event.getStartTime().getDate() + '-' + (event.getStartTime().getMonth()+1) + ' | '
-          + event.getStartTime().getHours() + ':' + event.getStartTime().getMinutes() + '-'
-          + event.getEndTime().getHours() + ':' + event.getEndTime().getMinutes();
+          + formatTime(event.getStartTime()) + '-'
+          + formatTime(event.getEndTime());
         event.getGuestList(false).forEach(function (guest){
           var contacts = data.contacts
           contacts.forEach(function(contact){
@@ -242,6 +242,20 @@ function openSlackLink(e) {
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
     .build();
+}
+
+function formatTime(date){
+  var time = "";
+  if(date.getHours() < 10){
+    time = time + "0";
+  }
+  time = time + date.getHours() + ":";
+  
+  if(date.getMinutes() < 10){
+    time = time + "0";
+  }
+  time = time + date.getMinutes();
+  return time;
 }
 
 function saveSlackChannel() {
