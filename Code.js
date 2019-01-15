@@ -141,48 +141,49 @@ function openSideBar(e) {
       });
 
       // Appointments
-    var cals = CalendarApp.getAllCalendars();
-    var widgets = [];
-    var appointmentSection = CardService.newCardSection();
-    appointmentSection.setHeader('Afspraken');
+      var cals = CalendarApp.getAllCalendars();
+      var widgets = [];
+      var appointmentSection = CardService.newCardSection();
+      appointmentSection.setHeader('Afspraken');
 
-    //Get events with the email that is currently selected
-    cals.forEach(function(cal){
-      cal.getEvents(new Date(),new Date(new Date().setFullYear(new Date().getFullYear()+1))).forEach(function(event){
-        var title = event.getTitle();
-        var times = formatDate(event.getStartTime()) + ' | '
-          + formatTime(event.getStartTime()) + '-'
-          + formatTime(event.getEndTime());
+      //Get events with the email that is currently selected
+      cals.forEach(function (cal) {
+        cal.getEvents(new Date(), new Date(new Date().setFullYear(new Date().getFullYear() + 1))).forEach(function (event) {
+          var title = event.getTitle();
+          var times = formatDate(event.getStartTime()) + ' | ' +
+            formatTime(event.getStartTime()) + '-' +
+            formatTime(event.getEndTime());
 
-        var calendarAction = CardService.newAction().setFunctionName('openCalendarEvent').setParameters({
-          "link": event.getId()
-        });
-      
-        event.getGuestList(false).forEach(function (guest){
-          var contacts = data.contacts
-          contacts.forEach(function(contact){
-            var contactEmail = contact.email.toLowerCase()
-            var guestEmail = guest.getEmail().toLowerCase()
-            if(contactEmail == guestEmail && widgets.length<5){
-              widgets.push(CardService.newKeyValue()
-                .setTopLabel(times)
-                .setIcon(CardService.Icon.INVITE)
-                .setContent(title))
-                .setOnClickAction(calendarAction);
-            };
+          var calendarAction = CardService.newAction().setFunctionName('openCalendarEvent').setParameters({
+            "link": event.getId()
+          });
+
+          event.getGuestList(false).forEach(function (guest) {
+            var contacts = data.contacts
+            contacts.forEach(function (contact) {
+              var contactEmail = contact.email.toLowerCase()
+              var guestEmail = guest.getEmail().toLowerCase()
+              if (contactEmail == guestEmail && widgets.length < 5) {
+                widgets.push(CardService.newKeyValue()
+                  .setTopLabel(times)
+                  .setIcon(CardService.Icon.INVITE)
+                  .setContent(title)
+                  .setOnClickAction(calendarAction)
+                )
+              };
+            });
           });
         });
       });
-    });
 
-    if(widgets.length!=0){
-      widgets.forEach(function(widget){
-        appointmentSection.addWidget(widget);
-      });
-    } else{
-      appointmentSection.addWidget(CardService.newTextParagraph().setText('None found'));
-    };
-      
+      if (widgets.length != 0) {
+        widgets.forEach(function (widget) {
+          appointmentSection.addWidget(widget);
+        });
+      } else {
+        appointmentSection.addWidget(CardService.newTextParagraph().setText('None found'));
+      };
+
       // Tickets
       var ticketSection = CardService.newCardSection();
       ticketSection.setHeader('Tickets (static)');
@@ -249,41 +250,41 @@ function openSlackLink(e) {
     .build();
 }
 
-function openCalendarEvent(e){
+function openCalendarEvent(e) {
   return CardService.newActionResponseBuilder()
-  .setOpenLink(CardService.newOpenLink()
-    .setUrl("https://www.google.com/calendar/event?eid="+e.parameters.link)
-    .setOpenAs(CardService.OpenAs.FULL_SIZE)
-    .setOnClose(CardService.OnClose.NOTHING))
-  .build();
+    .setOpenLink(CardService.newOpenLink()
+      .setUrl("https://www.google.com/calendar/event?eid=" + e.parameters.link)
+      .setOpenAs(CardService.OpenAs.FULL_SIZE)
+      .setOnClose(CardService.OnClose.NOTHING))
+    .build();
 }
 
-function formatTime(date){
+function formatTime(date) {
   var time = "";
-  if(date.getHours() < 10){
+  if (date.getHours() < 10) {
     time = time + "0";
   }
   time = time + date.getHours() + ":";
-  
-  if(date.getMinutes() < 10){
+
+  if (date.getMinutes() < 10) {
     time = time + "0";
   }
   time = time + date.getMinutes();
   return time;
 }
 
-function formatDate(date){
+function formatDate(date) {
   var time = ""
-  if(date.getDate()<10){
+  if (date.getDate() < 10) {
     time = time + "0";
   }
   time = time + date.getDate() + "-";
-  
-  var month = (date.getMonth()+1)
-  if(month  < 10){
+
+  var month = (date.getMonth() + 1)
+  if (month < 10) {
     time = time + "0";
   }
-  
+
   time = time + month + "-" + date.getFullYear();
   return time;
 }
