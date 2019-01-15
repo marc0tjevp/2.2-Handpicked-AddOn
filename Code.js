@@ -35,14 +35,6 @@ function openSideBar(e) {
     }]
   }
 
-  // Actions
-  var action = CardService.newAction().setFunctionName('notificationCallback');
-  var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({
-    "channel": data.company.slack
-  });
-  var saveSlackChannel = CardService.newAction().setFunctionName('saveSlackChannel');
-
-
   // Construct Card
   var card = CardService.newCardBuilder()
     .setName("Sidebar Overview")
@@ -50,59 +42,15 @@ function openSideBar(e) {
   // Construct Sections
   function createContactOverview() {
 
-    // Contacts Section
-    var contactSection = CardService.newCardSection();
-    contactSection.setHeader('Contactpersonen');
-    data.contacts.forEach(function (contact) {
-      var c = {
-        "name": contact.name,
-        "email": contact.email,
-        "phone": contact.phone,
-        "department": contact.department
-      }
-      contactSection.addWidget(
-        CardService.newKeyValue()
-        .setIcon(CardService.Icon.PERSON)
-        .setTopLabel(contact.name)
-        .setContent(contact.email)
-        .setOnClickAction(CardService.newAction().setFunctionName("contactDetail").setParameters(c))
-      );
-    });
+    var companySection = CardService.newCardSection();
 
-    // Contacts buttonset/ Slack input
-    if (data.company.slack.length > 0) {
-      contactSection.addWidget(CardService.newButtonSet()
-        .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
-        .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
-      );
-    } else {
-      contactSection.addWidget(CardService.newButtonSet()
-        .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
-      );
+    // Main check if the company was found
+    if (data.hasOwnProperty("company") == false) {
 
-      var slackChannel = CardService.newTextInput()
-        .setFieldName("channel")
-        .setTitle("Slack channel name:")
-        .setHint("General");
+      // Set header to Unknown
+      companySection.setHeader("Onbekend Bedrijf");
 
-      contactSection.addWidget(slackChannel);
-      contactSection.addWidget(CardService.newButtonSet()
-        .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
-      );
-    }
-
-    // Domain section
-    var domainName = CardService.newCardSection();
-    if (Object.keys(data.company.domains).length > 0) {
-      domainName.setHeader(data.company.name);
-      data.company.domains.forEach(function (domain) {
-        domainName.addWidget(CardService.newKeyValue()
-          .setTopLabel('Domain')
-          .setIcon(CardService.Icon.EMAIL)
-          .setContent(domain));
-      });
-    } else {
-      domainName.setHeader("Onbekend Bedrijf");
+      // Show the domain selector
       var dropdownGroup = CardService.newSelectionInput()
         .setType(CardService.SelectionInputType.DROPDOWN)
         .setTitle("Dit domein aan bedrijf koppelen")
@@ -110,49 +58,115 @@ function openSideBar(e) {
         .addItem("ING", "value_one", false)
         .addItem("RABOBANK", "value_two", false)
         .addItem("ABN-AMRO", "value_three", false);
-      domainName.addWidget(dropdownGroup);
-      domainName.addWidget(CardService.newButtonSet()
-        .addButton(CardService.newTextButton().setText('Opslaan')))
+      companySection.addWidget(dropdownGroup);
+
+      return card.addSection(companySection).build();
+
     }
 
-    // Deals
-    var dealSection = CardService.newCardSection();
-    dealSection.setHeader('Deals');
-    data.deals.forEach(function (deal) {
-      dealSection.addWidget(
-        CardService.newKeyValue()
-        .setTopLabel(deal.name)
-        .setIcon(CardService.Icon.DOLLAR)
-        .setContent(deal.deadline)
-      );
-    });
+    // If the company is found
+    else {
 
-    // Appointments
-    var appointmentSection = CardService.newCardSection();
-    appointmentSection.setHeader('Afspraken (static)');
-    staticjson.appointments.forEach(function (appointment) {
-      appointmentSection.addWidget(
-        CardService.newKeyValue()
-        .setTopLabel(appointment.date)
-        .setIcon(CardService.Icon.INVITE)
-        .setContent(appointment.content)
-      );
-    });
+      // Actions
+      var action = CardService.newAction().setFunctionName('notificationCallback');
+      var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({
+        "channel": data.company.slack
+      });
+      var saveSlackChannel = CardService.newAction().setFunctionName('saveSlackChannel');
 
-    // Tickets
-    var ticketSection = CardService.newCardSection();
-    ticketSection.setHeader('Tickets (static)');
-    staticjson.tickets.forEach(function (ticket) {
-      ticketSection.addWidget(
-        CardService.newKeyValue()
-        .setTopLabel(ticket.title)
-        .setIcon(CardService.Icon.TICKET)
-        .setContent(ticket.content)
-      );
-    });
+      // Show the company name
+      companySection.setHeader(data.company.name);
 
-    // Build card
-    return card.addSection(domainName).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+      // TODO: Build this again when the API returns domains
+      // if (data.company.domains) {
+      //   data.company.domains.forEach(function (domain) {
+      companySection.addWidget(CardService.newKeyValue()
+        .setTopLabel('Domain')
+        .setIcon(CardService.Icon.EMAIL)
+        .setContent("domain"));
+      //  });
+      // }
+
+      // Contacts Section
+      var contactSection = CardService.newCardSection();
+      contactSection.setHeader('Contactpersonen');
+      data.contacts.forEach(function (contact) {
+        var c = {
+          "name": contact.name,
+          "email": contact.email,
+          "phone": contact.phone,
+          "department": contact.department
+        }
+        contactSection.addWidget(
+          CardService.newKeyValue()
+          .setIcon(CardService.Icon.PERSON)
+          .setTopLabel(contact.name)
+          .setContent(contact.email)
+          .setOnClickAction(CardService.newAction().setFunctionName("contactDetail").setParameters(c))
+        );
+      });
+
+      // Contacts buttonset/ Slack input
+      if (data.company.slack.length > 0) {
+        contactSection.addWidget(CardService.newButtonSet()
+          .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
+          .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
+        );
+      } else {
+        contactSection.addWidget(CardService.newButtonSet()
+          .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
+        );
+
+        var slackChannel = CardService.newTextInput()
+          .setFieldName("channel")
+          .setTitle("Slack channel name:")
+          .setHint("General");
+
+        contactSection.addWidget(slackChannel);
+        contactSection.addWidget(CardService.newButtonSet()
+          .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
+        );
+      }
+
+      // Deals
+      var dealSection = CardService.newCardSection();
+      dealSection.setHeader('Deals');
+      data.deals.forEach(function (deal) {
+        dealSection.addWidget(
+          CardService.newKeyValue()
+          .setTopLabel(deal.name)
+          .setIcon(CardService.Icon.DOLLAR)
+          .setContent(deal.date)
+        );
+      });
+
+      // Appointments
+      var appointmentSection = CardService.newCardSection();
+      appointmentSection.setHeader('Afspraken (static)');
+      staticjson.appointments.forEach(function (appointment) {
+        appointmentSection.addWidget(
+          CardService.newKeyValue()
+          .setTopLabel(appointment.date)
+          .setIcon(CardService.Icon.INVITE)
+          .setContent(appointment.content)
+        );
+      });
+
+      // Tickets
+      var ticketSection = CardService.newCardSection();
+      ticketSection.setHeader('Tickets (static)');
+      staticjson.tickets.forEach(function (ticket) {
+        ticketSection.addWidget(
+          CardService.newKeyValue()
+          .setTopLabel(ticket.title)
+          .setIcon(CardService.Icon.TICKET)
+          .setContent(ticket.content)
+        );
+      });
+
+      return card.addSection(companySection).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+
+    }
 
   }
 
