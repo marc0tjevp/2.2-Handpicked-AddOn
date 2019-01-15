@@ -78,14 +78,14 @@ function openSideBar(e) {
       companySection.setHeader(data.company.name);
 
       // TODO: Build this again when the API returns domains
-      // if (data.company.domains) {
-      //   data.company.domains.forEach(function (domain) {
-      companySection.addWidget(CardService.newKeyValue()
-        .setTopLabel('Domain')
-        .setIcon(CardService.Icon.EMAIL)
-        .setContent("domain"));
-      //  });
-      // }
+      if (data.company && data.company.domains) {
+        data.company.domains.forEach(function (domain) {
+          companySection.addWidget(CardService.newKeyValue()
+            .setTopLabel('Domain')
+            .setIcon(CardService.Icon.EMAIL)
+            .setContent(domain));
+        });
+      }
 
       // Contacts Section
       var contactSection = CardService.newCardSection();
@@ -136,21 +136,53 @@ function openSideBar(e) {
           CardService.newKeyValue()
           .setTopLabel(deal.name)
           .setIcon(CardService.Icon.DOLLAR)
-          .setContent(deal.date)
+          .setContent(formatDate(new Date(deal.date.split('T')[0])))
         );
       });
 
       // Appointments
+      var cals = CalendarApp.getAllCalendars();
+      var widgets = [];
       var appointmentSection = CardService.newCardSection();
-      appointmentSection.setHeader('Afspraken (static)');
-      staticjson.appointments.forEach(function (appointment) {
-        appointmentSection.addWidget(
-          CardService.newKeyValue()
-          .setTopLabel(appointment.date)
-          .setIcon(CardService.Icon.INVITE)
-          .setContent(appointment.content)
-        );
+      appointmentSection.setHeader('Afspraken');
+
+      // Get events with the email that is currently selected
+      cals.forEach(function (cal) {
+        cal.getEvents(new Date(), new Date(new Date().setFullYear(new Date().getFullYear() + 1))).forEach(function (event) {
+          var title = event.getTitle();
+          var times = formatDate(event.getStartTime()) + ' | ' +
+            formatTime(event.getStartTime()) + '-' +
+            formatTime(event.getEndTime());
+
+          var calendarAction = CardService.newAction().setFunctionName('openCalendarEvent').setParameters({
+            "link": event.getId()
+          });
+
+          event.getGuestList(false).forEach(function (guest) {
+            var contacts = data.contacts
+            contacts.forEach(function (contact) {
+              var contactEmail = contact.email.toLowerCase()
+              var guestEmail = guest.getEmail().toLowerCase()
+              if (contactEmail == guestEmail && widgets.length < 5) {
+                widgets.push(CardService.newKeyValue()
+                  .setTopLabel(times)
+                  .setIcon(CardService.Icon.INVITE)
+                  .setContent(title)
+                  .setOnClickAction(calendarAction)
+                )
+              };
+            });
+          });
+        });
       });
+
+      if (widgets.length != 0) {
+        widgets.forEach(function (widget) {
+          appointmentSection.addWidget(widget);
+        });
+      } else {
+        appointmentSection.addWidget(CardService.newTextParagraph().setText('None found'));
+      };
 
       // Tickets
       var ticketSection = CardService.newCardSection();
@@ -216,6 +248,45 @@ function openSlackLink(e) {
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
     .build();
+}
+
+function openCalendarEvent(e) {
+  return CardService.newActionResponseBuilder()
+    .setOpenLink(CardService.newOpenLink()
+      .setUrl("https://www.google.com/calendar/event?eid=" + e.parameters.link)
+      .setOpenAs(CardService.OpenAs.FULL_SIZE)
+      .setOnClose(CardService.OnClose.NOTHING))
+    .build();
+}
+
+function formatTime(date) {
+  var time = "";
+  if (date.getHours() < 10) {
+    time = time + "0";
+  }
+  time = time + date.getHours() + ":";
+
+  if (date.getMinutes() < 10) {
+    time = time + "0";
+  }
+  time = time + date.getMinutes();
+  return time;
+}
+
+function formatDate(date) {
+  var time = ""
+  if (date.getDate() < 10) {
+    time = time + "0";
+  }
+  time = time + date.getDate() + "-";
+
+  var month = (date.getMonth() + 1)
+  if (month < 10) {
+    time = time + "0";
+  }
+
+  time = time + month + "-" + date.getFullYear();
+  return time;
 }
 
 function saveSlackChannel() {
