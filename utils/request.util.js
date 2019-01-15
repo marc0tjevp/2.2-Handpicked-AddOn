@@ -152,10 +152,9 @@ var doRequest = (verb, endpoint, data, callback) => {
             axios({
                     method: 'post',
                     url: endpoint,
-                    data: JSON.stringify(data),
+                    body: data,
                     headers: {
-                        'x-api-key': config.apikey,
-                        'Content-Type': 'application/json'
+                        'x-api-key': config.apikey
                     }
                 })
 
@@ -166,7 +165,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                     if (response) {
 
                         // On status 200, return data
-                        if (response.status == 200 || response.status == 201) {
+                        if (response.status == 200) {
                             callback(response.data)
                             return
                         }
@@ -254,7 +253,7 @@ var doRequest = (verb, endpoint, data, callback) => {
             axios({
                     method: 'put',
                     url: endpoint,
-                    data: JSON.stringify(data),
+                    body: data,
                     headers: {
                         'x-api-key': config.apikey
                     }
