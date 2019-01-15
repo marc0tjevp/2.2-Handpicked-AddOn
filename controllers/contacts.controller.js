@@ -13,9 +13,14 @@ let get = (req, res) => {
             }, (err, c) => {
 
                 let channel = ''
+                let domains = []
 
                 if (c && c.slack) {
                     channel = c.slack
+                }
+
+                if (c && c.domains) {
+                    domains = c.domains
                 }
 
                 if (err) {
@@ -28,7 +33,7 @@ let get = (req, res) => {
                         id: result.company.companyId,
                         name: result.company.name,
                         slack: channel,
-                        domains: c.domains,
+                        domains: domains,
                         originalId: result.company.originalId,
                         label: result.company.label
                     },
