@@ -7,24 +7,68 @@ let get = (req, res) => {
 
     request('get', 'http://handpicked.post-tech.nl:5000/api/Contacts?email=' + email, {}, (result) => {
 
-        res.status(200).json({
-            company: {
-                id: result.company.companyId,
-                name: result.company.name,
-                label: result.company.label
-            },
-            contact: {
-                id: result.contactId,
-                name: result.name,
-                email: result.email,
-                phone: result.phoneNr,
-                department: result.department
-            },
-            deals: result.deals
-        }).end()
+        if (result && result.company) {
+            Company.findOne({
+                companyId: result.company.companyId
+            }, (err, c) => {
 
+                let channel = ''
+                let domains = []
+
+                if (c && c.slack) {
+                    channel = c.slack
+                }
+
+                if (c && c.domains) {
+                    domains = c.domains
+                }
+
+                if (err) {
+                    res.status(200).json(err).end()
+                    return
+                }
+
+                request('get', 'http://handpicked.post-tech.nl:5000/api/Companies/' + result.company.originalId, {}, (data) => {
+
+                    formattedContacts = []
+
+                    data.contacts.forEach(contact => {
+                        if (contact.name != "Verwijderd contact") {
+                            formattedContacts.push({
+                                id: contact.contactId,
+                                originalId: contact.originalId,
+                                name: contact.name,
+                                email: contact.email,
+                                phone: contact.phoneNr,
+                                department: contact.department
+                            })
+                        }
+                    })
+
+                    res.status(200).json({
+                        company: {
+                            id: result.company.companyId,
+                            name: result.company.name,
+                            slack: channel,
+                            domains: domains,
+                            originalId: result.company.originalId,
+                            label: result.company.label
+                        },
+                        contacts: formattedContacts,
+                        deals: result.deals
+                    }).end()
+
+                })
+            })
+        }
+
+        // If no result
+        else {
+            res.status(404).json({
+                "Contacts Controller": "No Contact/Company found for " + email
+            }).end()
+        }
     })
-
 }
 
 let post = (req,res)=>{
@@ -96,8 +140,26 @@ let mock = (req, res) => {
 
 }
 
+let post = (req, res) => {
+    request('post', 'http://handpicked.post-tech.nl:5000/api/Contacts', {
+        OriginalId: req.body.originalId,
+        CompanyId: req.body.companyId,
+        Name: req.body.name,
+        Email: req.body.email,
+        PhoneNr: req.body.phoneNr,
+        Department: req.body.department
+    }, (data) => {
+        (res.status(200).json(data).end())
+    })
+}
+
 module.exports = {
     get,
+<<<<<<< HEAD
     mock,
     post
+=======
+    post,
+    mock
+>>>>>>> api-develop
 }

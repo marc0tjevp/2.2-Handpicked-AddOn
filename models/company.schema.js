@@ -10,6 +10,12 @@ var companySchema = new Schema({
         unique: true,
     },
 
+    // List of accociated domains.
+    domains:{
+        type: Array,
+        required: false
+    },
+
     // Slack channel
     slack: {
         type: String,
