@@ -155,11 +155,6 @@ let post = (req, res) => {
 
 module.exports = {
     get,
-<<<<<<< HEAD
     mock,
     post
-=======
-    post,
-    mock
->>>>>>> api-develop
 }
