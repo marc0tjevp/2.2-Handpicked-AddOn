@@ -78,14 +78,14 @@ function openSideBar(e) {
       companySection.setHeader(data.company.name);
 
       // TODO: Build this again when the API returns domains
-      // if (data.company.domains) {
-      //   data.company.domains.forEach(function (domain) {
-      companySection.addWidget(CardService.newKeyValue()
-        .setTopLabel('Domain')
-        .setIcon(CardService.Icon.EMAIL)
-        .setContent("domain"));
-      //  });
-      // }
+      if (data.company && data.company.domains) {
+        data.company.domains.forEach(function (domain) {
+          companySection.addWidget(CardService.newKeyValue()
+            .setTopLabel('Domain')
+            .setIcon(CardService.Icon.EMAIL)
+            .setContent(domain));
+        });
+      }
 
       // Contacts Section
       var contactSection = CardService.newCardSection();
@@ -146,7 +146,7 @@ function openSideBar(e) {
       var appointmentSection = CardService.newCardSection();
       appointmentSection.setHeader('Afspraken');
 
-      //Get events with the email that is currently selected
+      // Get events with the email that is currently selected
       cals.forEach(function (cal) {
         cal.getEvents(new Date(), new Date(new Date().setFullYear(new Date().getFullYear() + 1))).forEach(function (event) {
           var title = event.getTitle();
