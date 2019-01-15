@@ -136,7 +136,7 @@ function openSideBar(e) {
           CardService.newKeyValue()
           .setTopLabel(deal.name)
           .setIcon(CardService.Icon.DOLLAR)
-          .setContent(deal.date)
+          .setContent(deal.date.split('T')[0])
         );
       });
 
@@ -150,8 +150,7 @@ function openSideBar(e) {
     cals.forEach(function(cal){
       cal.getEvents(new Date(),new Date(new Date().setFullYear(new Date().getFullYear()+1))).forEach(function(event){
         var title = event.getTitle();
-        var times = event.getStartTime() + ' - ' + event.getEndTime() + event.getStartTime();
-        times = event.getStartTime().getDate() + '-' + (event.getStartTime().getMonth()+1) + ' | '
+        var times = formatDate(event.getStartTime()) + ' | '
           + formatTime(event.getStartTime()) + '-'
           + formatTime(event.getEndTime());
         event.getGuestList(false).forEach(function (guest){
@@ -159,7 +158,7 @@ function openSideBar(e) {
           contacts.forEach(function(contact){
             var contactEmail = contact.email.toLowerCase()
             var guestEmail = guest.getEmail().toLowerCase()
-            if(contactEmail == guestEmail){
+            if(contactEmail == guestEmail && widgets.length<5){
               widgets.push(CardService.newKeyValue()
                 .setTopLabel(times)
                 .setIcon(CardService.Icon.INVITE)
@@ -255,6 +254,22 @@ function formatTime(date){
     time = time + "0";
   }
   time = time + date.getMinutes();
+  return time;
+}
+
+function formatDate(date){
+  var time = ""
+  if(date.getDate()<10){
+    time = time + "0";
+  }
+  time = time + date.getDate() + "-";
+  
+  var month = (date.getMonth()+1)
+  if(month  < 10){
+    time = time + "0";
+  }
+  
+  time = time + month + "-" + date.getFullYear();
   return time;
 }
 
