@@ -28,6 +28,7 @@ let get = (req, res) => {
                         id: result.company.companyId,
                         name: result.company.name,
                         slack: channel,
+                        domains: c.domains,
                         originalId: result.company.originalId,
                         label: result.company.label
                     },
