@@ -136,7 +136,7 @@ function openSideBar(e) {
           CardService.newKeyValue()
           .setTopLabel(deal.name)
           .setIcon(CardService.Icon.DOLLAR)
-          .setContent(deal.date.split('T')[0])
+          .setContent(formatDate(new Date(deal.date.split('T')[0])))
         );
       });
 
@@ -153,6 +153,11 @@ function openSideBar(e) {
         var times = formatDate(event.getStartTime()) + ' | '
           + formatTime(event.getStartTime()) + '-'
           + formatTime(event.getEndTime());
+
+        var calendarAction = CardService.newAction().setFunctionName('openCalendarEvent').setParameters({
+          "link": event.getId()
+        });
+      
         event.getGuestList(false).forEach(function (guest){
           var contacts = data.contacts
           contacts.forEach(function(contact){
@@ -162,7 +167,8 @@ function openSideBar(e) {
               widgets.push(CardService.newKeyValue()
                 .setTopLabel(times)
                 .setIcon(CardService.Icon.INVITE)
-                .setContent(title));
+                .setContent(title))
+                .setOnClickAction(calendarAction);
             };
           });
         });
@@ -241,6 +247,15 @@ function openSlackLink(e) {
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
     .build();
+}
+
+function openCalendarEvent(e){
+  return CardService.newActionResponseBuilder()
+  .setOpenLink(CardService.newOpenLink()
+    .setUrl("https://www.google.com/calendar/event?eid="+e.parameters.link)
+    .setOpenAs(CardService.OpenAs.FULL_SIZE)
+    .setOnClose(CardService.OnClose.NOTHING))
+  .build();
 }
 
 function formatTime(date){
