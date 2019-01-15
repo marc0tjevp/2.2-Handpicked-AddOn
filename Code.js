@@ -155,12 +155,15 @@ function openSideBar(e) {
           + event.getStartTime().getHours() + ':' + event.getStartTime().getMinutes() + '-'
           + event.getEndTime().getHours() + ':' + event.getEndTime().getMinutes();
         event.getGuestList(false).forEach(function (guest){
-          if(guest.getEmail()==sender){
-            widgets.push(CardService.newKeyValue()
-              .setTopLabel(times)
-              .setIcon(CardService.Icon.INVITE)
-              .setContent(title));
-          };
+          var contacts = data.contacts
+          contacts.forEach(function(contact){
+            if(contact == guest.getEmail()){
+              widgets.push(CardService.newKeyValue()
+                .setTopLabel(times)
+                .setIcon(CardService.Icon.INVITE)
+                .setContent(title));
+            };
+          });
         });
       });
     });
