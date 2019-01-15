@@ -101,16 +101,37 @@ function openSideBar(e) {
     });
 
     // Appointments
+    var cals = CalendarApp.getAllCalendars();
+    var widgets = [];
     var appointmentSection = CardService.newCardSection();
-    appointmentSection.setHeader('Afspraken (static)');
-    staticjson.appointments.forEach(function (appointment) {
-      appointmentSection.addWidget(
-        CardService.newKeyValue()
-        .setTopLabel(appointment.date)
-        .setIcon(CardService.Icon.INVITE)
-        .setContent(appointment.content)
-      );
+    appointmentSection.setHeader('Afspraken');
+
+    //Get events with the email that is currently selected
+    cals.forEach(function(cal){
+      cal.getEvents(new Date(),new Date(new Date().setFullYear(new Date().getFullYear()+1))).forEach(function(event){
+        var title = event.getTitle();
+        var times = event.getStartTime() + ' - ' + event.getEndTime() + event.getStartTime();
+        times = event.getStartTime().getDate() + '-' + (event.getStartTime().getMonth()+1) + ' | '
+          + event.getStartTime().getHours() + ':' + event.getStartTime().getMinutes() + '-'
+          + event.getEndTime().getHours() + ':' + event.getEndTime().getMinutes();
+        event.getGuestList(false).forEach(function (guest){
+          if(guest.getEmail()==sender){
+            widgets.push(CardService.newKeyValue()
+              .setTopLabel(times)
+              .setIcon(CardService.Icon.INVITE)
+              .setContent(title));
+          };
+        });
+      });
     });
+
+    if(widgets.length!=0){
+      widgets.forEach(function(widget){
+        appointmentSection.addWidget(widget);
+      });
+    } else{
+      appointmentSection.addWidget(CardService.newTextParagraph().setText('None found'));
+    };
 
     // Tickets
     var ticketSection = CardService.newCardSection();
