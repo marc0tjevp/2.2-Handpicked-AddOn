@@ -157,7 +157,9 @@ function openSideBar(e) {
         event.getGuestList(false).forEach(function (guest){
           var contacts = data.contacts
           contacts.forEach(function(contact){
-            if(contact.email == guest.getEmail()){
+            var contactEmail = contact.email.toLowerCase()
+            var guestEmail = guest.getEmail().toLowerCase()
+            if(contactEmail == guestEmail){
               widgets.push(CardService.newKeyValue()
                 .setTopLabel(times)
                 .setIcon(CardService.Icon.INVITE)
