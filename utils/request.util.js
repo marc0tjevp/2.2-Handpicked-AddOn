@@ -174,7 +174,8 @@ var doRequest = (verb, endpoint, data, callback) => {
                         // Axios should filter out error 500 to the catch block, just to be sure.
                         if (response.status == 500) {
                             callback({
-                                "Request Handler": "Server returned error code 500"
+                                "Request Handler": "Server returned error code 500",
+                                "Status": 500
                             })
                             return
                         }
@@ -205,7 +206,8 @@ var doRequest = (verb, endpoint, data, callback) => {
                         // On status 500, return an error
                         if (error.response.status == 500) {
                             callback({
-                                "Request Handler": "Server returned error code 500"
+                                "Request Handler": "Server returned error code 500",
+                                "Status": 500
                             })
                             return
                         }
@@ -213,7 +215,8 @@ var doRequest = (verb, endpoint, data, callback) => {
                         // On status 401, return not authorized
                         if (error.response.status == 401) {
                             callback({
-                                "Request Handler": "Server returned error code 401"
+                                "Request Handler": "Server returned error code 401",
+                                "Status": 401
                             })
                             return
                         }
@@ -221,14 +224,17 @@ var doRequest = (verb, endpoint, data, callback) => {
                         // On status 404, return not found
                         if (error.response.status == 404) {
                             callback({
-                                "Request Handler": "Server returned error code 404"
+                                "Request Handler": "Server returned error code 404",
+                                "Status": 404
                             })
                             return
                         }
+                        console.dir(error);
 
                         // In all other cases
                         callback({
                             "Request Handler": "The server returned an unexpected error",
+                            "Status": error.response.status,
                             "Error": error.toString()
                         })
                         return
