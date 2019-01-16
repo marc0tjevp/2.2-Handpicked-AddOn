@@ -356,7 +356,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                 .then((response) => {
 
                     // On status 200, return data
-                    if (response.status == 200) {
+                    if (response.status == 200 || response.status == 201) {
                         callback(response.data)
                         return
                     }
