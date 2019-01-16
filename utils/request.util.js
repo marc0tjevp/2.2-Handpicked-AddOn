@@ -175,7 +175,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                         if (response.status == 500) {
                             callback({
                                 "Request Handler": "Server returned error code 500",
-                                "status-code": 500
+                                "Status": 500
                             })
                             return
                         }
@@ -207,7 +207,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                         if (error.response.status == 500) {
                             callback({
                                 "Request Handler": "Server returned error code 500",
-                                "status-code": 500
+                                "Status": 500
                             })
                             return
                         }
@@ -216,7 +216,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                         if (error.response.status == 401) {
                             callback({
                                 "Request Handler": "Server returned error code 401",
-                                "status-code": 401
+                                "Status": 401
                             })
                             return
                         }
@@ -225,7 +225,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                         if (error.response.status == 404) {
                             callback({
                                 "Request Handler": "Server returned error code 404",
-                                "status-code": 404
+                                "Status": 404
                             })
                             return
                         }
@@ -234,7 +234,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                         // In all other cases
                         callback({
                             "Request Handler": "The server returned an unexpected error",
-                            "status-code": error.response.status,
+                            "Status": error.response.status,
                             "Error": error.toString()
                         })
                         return
