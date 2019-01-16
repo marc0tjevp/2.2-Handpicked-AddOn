@@ -115,16 +115,19 @@ function openSideBar(e) {
         );
       } else {
         contactSection.addWidget(CardService.newButtonSet()
-          .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
+          .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(newContactAction))
         );
+
+        var slackSection = CardService.newCardSection();
+        slackSection.setHeader('Slack channel toevoegen');
 
         var slackChannel = CardService.newTextInput()
           .setFieldName("channel")
-          .setTitle("Slack channel name:")
+          .setTitle("Channel naam:")
           .setHint("General");
 
-        contactSection.addWidget(slackChannel);
-        contactSection.addWidget(CardService.newButtonSet()
+          slackSection.addWidget(slackChannel);
+          slackSection.addWidget(CardService.newButtonSet()
           .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
         );
       }
@@ -197,8 +200,8 @@ function openSideBar(e) {
         );
       });
 
-      return card.addSection(companySection).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
-
+      return card.addSection(companySection).addSection(contactSection).addSection(slackSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+      routes.post('/', controller.post)
     }
 
   }
@@ -371,7 +374,17 @@ function formatDate(date) {
 }
 
 function saveSlackChannel() {
+  var url = 'https://hp-develop.herokuapp.com/api/companies'
+  var myJSON = JSON.stringify('{"slack": "' + e.formInput.channel + '"}');
 
+  var options = {
+    'method' : 'post',                  // specify the request type
+    'contentType': 'application/json',  // specify the Media Type 
+    'payload' : myJSON                  // my JSON stringified object
+  };
+  
+  // send the request
+  UrlFetchApp.fetch(url, options);
 }
 
 function postNewContact(e){
