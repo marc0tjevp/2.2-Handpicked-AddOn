@@ -288,7 +288,7 @@ function newContact(e) {
     .setFieldName('companyIdInput')
     .setTitle('CompanyId')
   )
-  var action = CardService.newAction().setFunctionName('logFunctionResults');
+  var action = CardService.newAction().setFunctionName('postNewContact');
 
   details.addWidget(CardService.newButtonSet()
     .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(action)));
