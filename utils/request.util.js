@@ -152,7 +152,7 @@ var doRequest = (verb, endpoint, data, callback) => {
             axios({
                     method: 'post',
                     url: endpoint,
-                    body: data,
+                    data: JSON.stringify(data),
                     headers: {
                         'x-api-key': config.apikey
                     }
@@ -253,7 +253,7 @@ var doRequest = (verb, endpoint, data, callback) => {
             axios({
                     method: 'put',
                     url: endpoint,
-                    body: data,
+                    data: JSON.stringify(data),
                     headers: {
                         'x-api-key': config.apikey
                     }
