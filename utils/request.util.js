@@ -154,7 +154,8 @@ var doRequest = (verb, endpoint, data, callback) => {
                     url: endpoint,
                     data: JSON.stringify(data),
                     headers: {
-                        'x-api-key': config.apikey
+                        'x-api-key': config.apikey,
+                        'Content-Type': 'application/json'
                     }
                 })
 
@@ -165,7 +166,7 @@ var doRequest = (verb, endpoint, data, callback) => {
                     if (response) {
 
                         // On status 200, return data
-                        if (response.status == 200) {
+                        if (response.status == 200 || response.status == 201) {
                             callback(response.data)
                             return
                         }
