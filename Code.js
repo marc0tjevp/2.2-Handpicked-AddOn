@@ -73,6 +73,7 @@ function openSideBar(e) {
         "channel": data.company.slack
       });
       var saveSlackChannel = CardService.newAction().setFunctionName('saveSlackChannel');
+      var newContactAction = CardService.newAction().setFunctionName('newContact');
 
       // Show the company name
       companySection.setHeader(data.company.name);
@@ -109,7 +110,7 @@ function openSideBar(e) {
       // Contacts buttonset/ Slack input
       if (data.company.slack.length > 0) {
         contactSection.addWidget(CardService.newButtonSet()
-          .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(action))
+          .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(newContactAction))
           .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
         );
       } else {
@@ -240,6 +241,61 @@ function contactDetail(e) {
   return card.addSection(details).build();
 }
 
+//New Contact
+function newContact(e) {
+
+  var card = CardService.newCardBuilder()
+    .setName('New Contact')
+
+  var details = CardService.newCardSection();
+
+  details.addWidget(
+    CardService.newTextInput()
+    .setFieldName('emailInput')
+    .setTitle('E-mail')
+    .setHint('New contact e-mail')
+  )
+
+  details.addWidget(
+    CardService.newTextInput()
+    .setFieldName('nameInput')
+    .setTitle('Name')
+    .setHint('New contact name')
+  )
+
+  details.addWidget(
+    CardService.newTextInput()
+    .setFieldName('phoneNrInput')
+    .setTitle('PhoneNr')
+    .setHint('New contact phoneNr')
+  )
+
+  details.addWidget(
+    CardService.newTextInput()
+    .setFieldName('departmentInput')
+    .setTitle('Department')
+    .setHint('New contact department')
+  )
+
+  details.addWidget(
+    CardService.newTextInput()
+    .setFieldName('originalIdInput')
+    .setTitle('OriginalId')
+  )
+
+  details.addWidget(
+    CardService.newTextInput()
+    .setFieldName('companyIdInput')
+    .setTitle('CompanyId')
+  )
+  var action = CardService.newAction().setFunctionName('postNewContact');
+
+  details.addWidget(CardService.newButtonSet()
+    .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(action)));
+
+  return card.addSection(details).build();
+}
+
 //Action Functions
 function openSlackLink(e) {
   return CardService.newActionResponseBuilder()
@@ -257,6 +313,31 @@ function openCalendarEvent(e) {
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
     .build();
+}
+
+//Temp to check values passed
+function logFunctionResults(e){
+  var card = CardService.newCardBuilder()
+    .setName('New Contact')
+    var data = {
+      "originalId": String(e.formInput.originalIdInput),
+      "companyId": Number(e.formInput.companyIdInput),
+      "name": String(e.formInput.nameInput),
+      "email": String(e.formInput.emailInput),
+      "phoneNr": String(e.formInput.phoneNrInput),
+      "department": String(e.formInput.departmentInput)
+    }
+    var a = false;
+
+    if(typeof data.email === 'string' && typeof data.companyId==='number'){
+      a = true;
+    }
+
+  var details = CardService.newCardSection();
+  details.addWidget(CardService.newKeyValue().setContent(data.email + data.companyId))
+  details.addWidget(CardService.newKeyValue().setContent(a))
+  return card.addSection(details).build();
+
 }
 
 function formatTime(date) {
@@ -291,4 +372,23 @@ function formatDate(date) {
 
 function saveSlackChannel() {
 
+}
+
+function postNewContact(e){
+  var url = 'https://hp-develop.herokuapp.com/api/contacts';
+  var data = {
+    "originalId": String(e.formInput.originalIdInput),
+    "companyId": Number(e.formInput.companyIdInput),
+    "name": String(e.formInput.nameInput),
+    "email": String(e.formInput.emailInput),
+    "phoneNr": String(e.formInput.phoneNrInput),
+    "department": String(e.formInput.departmentInput)
+  }
+  var HTTPoptions = {
+    'method' : 'post',
+    'contentType': 'application/json',
+    'payload' : JSON.stringify(data)
+  }
+
+  UrlFetchApp.fetch(url,HTTPoptions);
 }
