@@ -13,17 +13,43 @@ let post = (req, res) => {
         return
     }
 
-    const company = new Company({
-        companyId: companyId,
-        slack: slack
-    })
+    Company.findOne({
+        companyId: companyId
+    }, (err, c) => {
 
-    company.save(function (err) {
+        // If company exists, edit the slack channel
+        if (c && c.slack) {
+            c.slack = slack
+            c.save()
+            res.status(200).json(c).end()
+            return
+        }
+
+        // Check for Mono errors
         if (err) {
             res.status(500).json(err).end()
-        } else {
-            res.status(200).json(company).end()
+            return
         }
+        
+        // Else insert new company
+        else {
+
+            // New Company Object
+            const company = new Company({
+                companyId: companyId,
+                slack: slack
+            })
+
+            // Save the company
+            company.save(function (err) {
+                if (err) {
+                    res.status(500).json(err).end()
+                } else {
+                    res.status(200).json(company).end()
+                }
+            })
+        }
+
     })
 
 }
