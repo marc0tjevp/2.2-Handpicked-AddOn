@@ -1,3 +1,7 @@
+// Construct Card
+var card = CardService.newCardBuilder()
+.setName('Sidebar Overview')
+
 function openSideBar(e) {
 
   // Gmail Authentication
@@ -34,10 +38,6 @@ function openSideBar(e) {
       content: "Robin Schellius"
     }]
   }
-
-  // Construct Card
-  var card = CardService.newCardBuilder()
-    .setName('Sidebar Overview')
 
   // Construct Sections
   function createContactOverview() {
@@ -394,7 +394,10 @@ function saveSlackChannel(e) {
   
   // send the request
   UrlFetchApp.fetch(url, options);
-  showSidebar();
+
+  openSideBar(e);
+  return CardService.newNavigation().updateCard(card.build());
+
 }
 
 function postNewContact(e){
