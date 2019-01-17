@@ -7,10 +7,10 @@ function openSideBar(e) {
   // Email Data
   var messageId = e.messageMetadata.messageId;
   var message = GmailApp.getMessageById(messageId);
-  var sender = message.getFrom().replace(/^.+<([^>]+)>$/, "$1");
+  var sender = message.getFrom().replace(/^.+<([^>]+)>$/, '$1');
 
   // Mock Endpoint
-  var endpoint = "https://hp-develop.herokuapp.com/api/contacts/Brian.Hendriks@Vink.nl"
+  var endpoint = 'https://hp-develop.herokuapp.com/api/contacts/Brian.Hendriks@Vink.nl'
   //"https://hp-develop.herokuapp.com/api/contacts/" + sender;
   var response = UrlFetchApp.fetch(endpoint, {
     'muteHttpExceptions': true
@@ -37,7 +37,7 @@ function openSideBar(e) {
 
   // Construct Card
   var card = CardService.newCardBuilder()
-    .setName("Sidebar Overview")
+    .setName('Sidebar Overview')
 
   // Construct Sections
   function createContactOverview() {
@@ -45,19 +45,19 @@ function openSideBar(e) {
     var companySection = CardService.newCardSection();
 
     // Main check if the company was found
-    if (data.hasOwnProperty("company") == false) {
+    if (data.hasOwnProperty('company') == false) {
 
       // Set header to Unknown
-      companySection.setHeader("Onbekend Bedrijf");
+      companySection.setHeader('Onbekend Bedrijf');
 
       // Show the domain selector
       var dropdownGroup = CardService.newSelectionInput()
         .setType(CardService.SelectionInputType.DROPDOWN)
-        .setTitle("Dit domein aan bedrijf koppelen")
-        .setFieldName("TestFieldName")
-        .addItem("ING", "value_one", false)
-        .addItem("RABOBANK", "value_two", false)
-        .addItem("ABN-AMRO", "value_three", false);
+        .setTitle('Dit domein aan bedrijf koppelen')
+        .setFieldName('TestFieldName')
+        .addItem('ING', 'value_one', false)
+        .addItem('RABOBANK', 'value_two', false)
+        .addItem('ABN-AMRO', 'value_three', false);
       companySection.addWidget(dropdownGroup);
 
       return card.addSection(companySection).build();
@@ -72,7 +72,9 @@ function openSideBar(e) {
       var slackAction = CardService.newAction().setFunctionName('openSlackLink').setParameters({
         "channel": data.company.slack
       });
-      var saveSlackChannel = CardService.newAction().setFunctionName('saveSlackChannel');
+      var saveSlackChannelAction = CardService.newAction().setFunctionName('saveSlackChannel').setParameters({
+        "companyID": data.company.id.toString()
+      });
       var newContactAction = CardService.newAction().setFunctionName('newContact');
 
       // Show the company name
@@ -103,7 +105,7 @@ function openSideBar(e) {
           .setIcon(CardService.Icon.PERSON)
           .setTopLabel(contact.name)
           .setContent(contact.email)
-          .setOnClickAction(CardService.newAction().setFunctionName("contactDetail").setParameters(c))
+          .setOnClickAction(CardService.newAction().setFunctionName('contactDetail').setParameters(c))
         );
       });
 
@@ -119,16 +121,15 @@ function openSideBar(e) {
         );
 
         var slackSection = CardService.newCardSection();
-        slackSection.setHeader('Slack channel toevoegen');
+        slackSection.setHeader('Slack Channel');
 
         var slackChannel = CardService.newTextInput()
-          .setFieldName("channel")
-          .setTitle("Channel naam:")
-          .setHint("General");
+          .setFieldName('channel')
+          .setTitle('Channel Naam');
 
           slackSection.addWidget(slackChannel);
           slackSection.addWidget(CardService.newButtonSet()
-          .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannel))
+          .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannelAction))
         );
       }
 
@@ -185,7 +186,7 @@ function openSideBar(e) {
           appointmentSection.addWidget(widget);
         });
       } else {
-        appointmentSection.addWidget(CardService.newTextParagraph().setText('None found'));
+        appointmentSection.addWidget(CardService.newTextParagraph().setText('Geen aankomende afspraken gevonden...'));
       };
 
       // Tickets
@@ -216,27 +217,27 @@ function openSideBar(e) {
 function contactDetail(e) {
 
   var card = CardService.newCardBuilder()
-    .setName("Contact Overview")
+    .setName('Contact Overview')
 
   var details = CardService.newCardSection();
   details.addWidget(
-    CardService.newImage().setAltText("Avatar").setImageUrl("https://via.placeholder.com/512x260")
+    CardService.newImage().setAltText('Avatar').setImageUrl('https://via.placeholder.com/512x260')
   )
   details.addWidget(
     CardService.newKeyValue()
-    .setTopLabel("Naam")
+    .setTopLabel('Naam')
     .setIcon(CardService.Icon.PERSON)
     .setContent(e.parameters.name)
   );
   details.addWidget(
     CardService.newKeyValue()
-    .setTopLabel("Email")
+    .setTopLabel('Email')
     .setIcon(CardService.Icon.EMAIL)
     .setContent(e.parameters.email)
   );
   details.addWidget(
     CardService.newKeyValue()
-    .setTopLabel("Telefoon")
+    .setTopLabel('Telefoon')
     .setIcon(CardService.Icon.PHONE)
     .setContent(e.parameters.telephone)
   );
@@ -303,7 +304,7 @@ function newContact(e) {
 function openSlackLink(e) {
   return CardService.newActionResponseBuilder()
     .setOpenLink(CardService.newOpenLink()
-      .setUrl("https://avansinformaticabreda.slack.com/messages/" + e.parameters.channel)
+      .setUrl('https://avansinformaticabreda.slack.com/messages/' + e.parameters.channel)
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
     .build();
@@ -312,7 +313,7 @@ function openSlackLink(e) {
 function openCalendarEvent(e) {
   return CardService.newActionResponseBuilder()
     .setOpenLink(CardService.newOpenLink()
-      .setUrl("https://www.google.com/calendar/event?eid=" + e.parameters.link)
+      .setUrl('https://www.google.com/calendar/event?eid=' + e.parameters.link)
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
     .build();
@@ -373,14 +374,17 @@ function formatDate(date) {
   return time;
 }
 
-function saveSlackChannel() {
+function saveSlackChannel(e) {
   var url = 'https://hp-develop.herokuapp.com/api/companies'
-  var myJSON = JSON.stringify('{"slack": "' + e.formInput.channel + '"}');
+  var data = {
+    "slack": String(e.formInput.channel),
+    "companyId": Number(e.parameters.companyID)
+  };
 
   var options = {
-    'method' : 'post',                  // specify the request type
-    'contentType': 'application/json',  // specify the Media Type 
-    'payload' : myJSON                  // my JSON stringified object
+    'method' : 'post',
+    'contentType': 'application/json',
+    'payload' : JSON.stringify(data) 
   };
   
   // send the request
