@@ -109,19 +109,19 @@ function openSideBar(e) {
         );
       });
 
+      var slackSection = CardService.newCardSection();
+        slackSection.setHeader('Slack Channel');
+
       // Contacts buttonset/ Slack input
       if (data.company.slack.length > 0) {
         contactSection.addWidget(CardService.newButtonSet()
           .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(newContactAction))
           .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
-        );
+          );
       } else {
         contactSection.addWidget(CardService.newButtonSet()
           .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(newContactAction))
-        );
-
-        var slackSection = CardService.newCardSection();
-        slackSection.setHeader('Slack Channel');
+        );        
 
         var slackChannel = CardService.newTextInput()
           .setFieldName('channel')
@@ -201,8 +201,13 @@ function openSideBar(e) {
         );
       });
 
-      return card.addSection(companySection).addSection(contactSection).addSection(slackSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+      if (data.company.slack.length > 0) {
+      return card.addSection(companySection).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
       routes.post('/', controller.post)
+    } else {
+      return card.addSection(companySection).addSection(contactSection).addSection(slackSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+    }
+
     }
 
   }
@@ -389,6 +394,7 @@ function saveSlackChannel(e) {
   
   // send the request
   UrlFetchApp.fetch(url, options);
+  showSidebar();
 }
 
 function postNewContact(e){
