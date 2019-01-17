@@ -1,6 +1,6 @@
 // Construct Card
 var card = CardService.newCardBuilder()
-.setName('Sidebar Overview')
+  .setName('Sidebar Overview')
 
 function openSideBar(e) {
 
@@ -13,9 +13,8 @@ function openSideBar(e) {
   var message = GmailApp.getMessageById(messageId);
   var sender = message.getFrom().replace(/^.+<([^>]+)>$/, '$1');
 
-  // Mock Endpoint
-  var endpoint = 'https://hp-develop.herokuapp.com/api/contacts/Brian.Hendriks@Vink.nl'
-  //"https://hp-develop.herokuapp.com/api/contacts/" + sender;
+  // Endpoint
+  var endpoint = 'https://hp-develop.herokuapp.com/api/contacts/' + sender
   var response = UrlFetchApp.fetch(endpoint, {
     'muteHttpExceptions': true
   });
@@ -24,15 +23,6 @@ function openSideBar(e) {
 
   // Static mock data
   var staticjson = {
-    appointments: [{
-        date: "12 januari | 12:00 - 13:00",
-        content: "LD121"
-      },
-      {
-        date: "14 januari | 09:15 - 12:00",
-        content: "LA201"
-      }
-    ],
     tickets: [{
       title: "Ticket #102030",
       content: "Robin Schellius"
@@ -50,16 +40,26 @@ function openSideBar(e) {
       // Set header to Unknown
       companySection.setHeader('Onbekend Bedrijf');
 
+      var endpoint = 'https://hp-develop.herokuapp.com/api/companies'
+      var response = UrlFetchApp.fetch(endpoint);
+      var json = response.getContentText();
+      var companies = JSON.parse(json);
+
       // Show the domain selector
       var dropdownGroup = CardService.newSelectionInput()
         .setType(CardService.SelectionInputType.DROPDOWN)
         .setTitle('Dit domein aan bedrijf koppelen')
-        .setFieldName('TestFieldName')
-        .addItem('ING', 'value_one', false)
-        .addItem('RABOBANK', 'value_two', false)
-        .addItem('ABN-AMRO', 'value_three', false);
-      companySection.addWidget(dropdownGroup);
+        .setFieldName('companyDropdown');
 
+      companies.forEach(function (company) {
+        dropdownGroup.addItem(company.name, company.companyId, false)
+          .setOnChangeAction(CardService.newAction()
+            .setFunctionName("selectedCompany").setParameters({
+              domain: "avans.nl"
+            }))
+      });
+
+      companySection.addWidget(dropdownGroup);
       return card.addSection(companySection).build();
 
     }
@@ -80,14 +80,18 @@ function openSideBar(e) {
       // Show the company name
       companySection.setHeader(data.company.name);
 
-      // TODO: Build this again when the API returns domains
-      if (data.company && data.company.domains) {
+      if (data.company && data.company.domains > 0) {
         data.company.domains.forEach(function (domain) {
           companySection.addWidget(CardService.newKeyValue()
             .setTopLabel('Domain')
             .setIcon(CardService.Icon.EMAIL)
             .setContent(domain));
         });
+      }
+
+      // Else show no domains
+      else {
+        companySection.addWidget(CardService.newTextParagraph().setText('Geen domeinen gevonden...'));
       }
 
       // Contacts Section
@@ -110,25 +114,25 @@ function openSideBar(e) {
       });
 
       var slackSection = CardService.newCardSection();
-        slackSection.setHeader('Slack Channel');
+      slackSection.setHeader('Slack Channel');
 
       // Contacts buttonset/ Slack input
       if (data.company.slack.length > 0) {
         contactSection.addWidget(CardService.newButtonSet()
           .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(newContactAction))
           .addButton(CardService.newTextButton().setText('Slack').setOnClickAction(slackAction))
-          );
+        );
       } else {
         contactSection.addWidget(CardService.newButtonSet()
           .addButton(CardService.newTextButton().setText('Contact Toevoegen').setOnClickAction(newContactAction))
-        );        
+        );
 
         var slackChannel = CardService.newTextInput()
           .setFieldName('channel')
           .setTitle('Channel Naam');
 
-          slackSection.addWidget(slackChannel);
-          slackSection.addWidget(CardService.newButtonSet()
+        slackSection.addWidget(slackChannel);
+        slackSection.addWidget(CardService.newButtonSet()
           .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(saveSlackChannelAction))
         );
       }
@@ -136,14 +140,18 @@ function openSideBar(e) {
       // Deals
       var dealSection = CardService.newCardSection();
       dealSection.setHeader('Deals');
-      data.deals.forEach(function (deal) {
-        dealSection.addWidget(
-          CardService.newKeyValue()
-          .setTopLabel(deal.name)
-          .setIcon(CardService.Icon.DOLLAR)
-          .setContent(formatDate(new Date(deal.date.split('T')[0])))
-        );
-      });
+      if (data.deals && data.company.deals > 0) {
+        data.deals.forEach(function (deal) {
+          dealSection.addWidget(
+            CardService.newKeyValue()
+            .setTopLabel(deal.name)
+            .setIcon(CardService.Icon.DOLLAR)
+            .setContent(formatDate(new Date(deal.date.split('T')[0])))
+          );
+        });
+      } else {
+        dealSection.addWidget(CardService.newTextParagraph().setText('Geen deals gevonden...'));
+      }
 
       // Appointments
       var cals = CalendarApp.getAllCalendars();
@@ -202,11 +210,10 @@ function openSideBar(e) {
       });
 
       if (data.company.slack.length > 0) {
-      return card.addSection(companySection).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
-      routes.post('/', controller.post)
-    } else {
-      return card.addSection(companySection).addSection(contactSection).addSection(slackSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
-    }
+        return card.addSection(companySection).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+      } else {
+        return card.addSection(companySection).addSection(contactSection).addSection(slackSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+      }
 
     }
 
@@ -315,6 +322,31 @@ function openSlackLink(e) {
     .build();
 }
 
+function selectedCompany(e) {
+  dropdownId = Number(e.formInput.companyDropdown)
+  dropdownDomain = e.parameters.domain
+
+  var url = 'https://hp-develop.herokuapp.com/api/domains'
+  var data = {
+    "domain": dropdownDomain,
+    "companyid": dropdownId
+  };
+
+  var options = {
+    'method': 'post',
+    'contentType': 'application/json',
+    'payload': JSON.stringify(data),
+    'muteHttpExceptions': false
+  };
+
+  // send the request
+  UrlFetchApp.fetch(url, options);
+
+  openSideBar(e);
+  return CardService.newNavigation().updateCard(card.build());
+
+}
+
 function openCalendarEvent(e) {
   return CardService.newActionResponseBuilder()
     .setOpenLink(CardService.newOpenLink()
@@ -322,31 +354,6 @@ function openCalendarEvent(e) {
       .setOpenAs(CardService.OpenAs.FULL_SIZE)
       .setOnClose(CardService.OnClose.NOTHING))
     .build();
-}
-
-//Temp to check values passed
-function logFunctionResults(e){
-  var card = CardService.newCardBuilder()
-    .setName('New Contact')
-    var data = {
-      "originalId": String(e.formInput.originalIdInput),
-      "companyId": Number(e.formInput.companyIdInput),
-      "name": String(e.formInput.nameInput),
-      "email": String(e.formInput.emailInput),
-      "phoneNr": String(e.formInput.phoneNrInput),
-      "department": String(e.formInput.departmentInput)
-    }
-    var a = false;
-
-    if(typeof data.email === 'string' && typeof data.companyId==='number'){
-      a = true;
-    }
-
-  var details = CardService.newCardSection();
-  details.addWidget(CardService.newKeyValue().setContent(data.email + data.companyId))
-  details.addWidget(CardService.newKeyValue().setContent(a))
-  return card.addSection(details).build();
-
 }
 
 function formatTime(date) {
@@ -387,11 +394,11 @@ function saveSlackChannel(e) {
   };
 
   var options = {
-    'method' : 'post',
+    'method': 'post',
     'contentType': 'application/json',
-    'payload' : JSON.stringify(data) 
+    'payload': JSON.stringify(data)
   };
-  
+
   // send the request
   UrlFetchApp.fetch(url, options);
 
@@ -400,7 +407,7 @@ function saveSlackChannel(e) {
 
 }
 
-function postNewContact(e){
+function postNewContact(e) {
   var url = 'https://hp-develop.herokuapp.com/api/contacts';
   var data = {
     "originalId": String(e.formInput.originalIdInput),
@@ -411,10 +418,10 @@ function postNewContact(e){
     "department": String(e.formInput.departmentInput)
   }
   var HTTPoptions = {
-    'method' : 'post',
+    'method': 'post',
     'contentType': 'application/json',
-    'payload' : JSON.stringify(data)
+    'payload': JSON.stringify(data)
   }
 
-  UrlFetchApp.fetch(url,HTTPoptions);
+  UrlFetchApp.fetch(url, HTTPoptions);
 }
