@@ -14,11 +14,14 @@ let post = (req, res) => {
         return;
     }
 
-    request('get', 'http://handpicked.post-tech.nl:5000/api/Companies/' + companyId, {}, (result) => {
-
     Company.findOne({
         companyId: companyId
     }, (err, c) => {
+
+        if (err) {
+            res.status(200).json(err).end()
+            return;
+        }
 
         if (c && c.domains) {
 
@@ -32,39 +35,21 @@ let post = (req, res) => {
             return;
         }
 
-        if(companyId != result.companyId){
-            message = {
-                message: "Contacts Controller : Invalid company id " + req.body.companyid
-            };
-            res.status(200).json(message).end();
+        // Else
+        else {
+
+            c = new Company({
+                companyId: req.body.companyid,
+                domains: [req.body.domain]
+            })
+
+            c.save();
+
+            res.status(200).json(c).end()
             return;
         }
 
-        if (!result.companyId) {
-            console.log(result.company);
-            message = {
-                message: "Contacts Controller : No Company found for " + req.body.companyid
-            };
-            res.status(200).json(message).end();
-            return;
-        }
-
-        if (err) {
-            res.status(200).json(err).end()
-            return;
-        }
-
-        c = new Company({
-            companyId: req.body.companyid,
-            domains: [req.body.domain]
-        });
-        c.save();
-
-        res.status(200).json(c).end();
-        return;
     })
-})
-
 }
 module.exports = {
     post
