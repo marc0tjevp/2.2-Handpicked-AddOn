@@ -6,16 +6,15 @@ let post = (req, res) => {
 
     let domain = req.body.domain || ''
     let companyId = req.body.companyid || ''
-    let email = req.body.email || ''
 
-    if (domain == '' || companyId == '' || email == '') {
+    if (domain == '' || companyId == '') {
         res.status(412).send({
-            "Domain Controller": "Please provide parameters domain, companyId, email"
+            "Domain Controller": "Please provide parameters domain, companyId"
         })
         return;
     }
 
-    request('get', 'http://handpicked.post-tech.nl:5000/api/Contacts?email=' + email, {}, (result) => {
+    request('get', 'http://handpicked.post-tech.nl:5000/api/Companies/' + companyId, {}, (result) => {
 
     Company.findOne({
         companyId: companyId
@@ -33,7 +32,7 @@ let post = (req, res) => {
             return;
         }
 
-        if(companyId != result.company.companyId){
+        if(companyId != result.companyId){
             message = {
                 message: "Contacts Controller : Invalid company id " + req.body.companyid
             };
@@ -41,7 +40,7 @@ let post = (req, res) => {
             return;
         }
 
-        if (!result.company.companyId) {
+        if (!result.companyId) {
             console.log(result.company);
             message = {
                 message: "Contacts Controller : No Company found for " + req.body.companyid
