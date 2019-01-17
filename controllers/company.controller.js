@@ -10,46 +10,45 @@ let post = (req, res) => {
         res.status(412).json({
             "Company Controller: ": "Please provide parameters slack and companyId"
         }).end()
-        return
+        return;
     }
 
     Company.findOne({
         companyId: companyId
     }, (err, c) => {
 
-        // If company exists, edit the slack channel
-        if (c && c.slack) {
-            c.slack = slack
-            c.save()
-            res.status(200).json(c).end()
-            return
-        }
-
         // Check for Mono errors
         if (err) {
             res.status(500).json(err).end()
-            return
+        } else {
+
+            // If company exists, edit the slack channel
+            if (c && c.slack) {
+                c.slack = slack
+                c.save()
+                res.status(200).json(c).end()
+                return;
+            }
+
+            // Else insert new company
+            else {
+
+                // New Company Object
+                const company = new Company({
+                    companyId: companyId,
+                    slack: slack
+                })
+
+                // Save the company
+                company.save(function (err) {
+                    if (err) {
+                        res.status(500).json(err).end()
+                    } else {
+                        res.status(200).json(company).end()
+                    }
+                })
+            }
         }
-        
-        // Else insert new company
-        else {
-
-            // New Company Object
-            const company = new Company({
-                companyId: companyId,
-                slack: slack
-            })
-
-            // Save the company
-            company.save(function (err) {
-                if (err) {
-                    res.status(500).json(err).end()
-                } else {
-                    res.status(200).json(company).end()
-                }
-            })
-        }
-
     })
 
 }
