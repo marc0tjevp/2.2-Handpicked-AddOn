@@ -48,14 +48,14 @@ function openSideBar(e) {
       // Show the domain selector
       var dropdownGroup = CardService.newSelectionInput()
         .setType(CardService.SelectionInputType.DROPDOWN)
-        .setTitle('Dit domein aan bedrijf koppelen')
+        .setTitle(sender.replace(/.*@/, "") + ' aan bedrijf koppelen')
         .setFieldName('companyDropdown');
 
       companies.forEach(function (company) {
         dropdownGroup.addItem(company.name, company.companyId, false)
           .setOnChangeAction(CardService.newAction()
             .setFunctionName("selectedCompany").setParameters({
-              domain: "avans.nl"
+              domain: sender.replace(/.*@/, "")
             }))
       });
 
@@ -75,12 +75,12 @@ function openSideBar(e) {
       var saveSlackChannelAction = CardService.newAction().setFunctionName('saveSlackChannel').setParameters({
         "companyID": data.company.id.toString()
       });
-      var newContactAction = CardService.newAction().setFunctionName('newContact');
+      var newContactAction = CardService.newAction().setFunctionName('newContact').setParameters({"email": sender, "company": data.company.originalId});
 
       // Show the company name
       companySection.setHeader(data.company.name);
 
-      if (data.company && data.company.domains > 0) {
+      if (data.company && data.company.domains.length > 0) {
         data.company.domains.forEach(function (domain) {
           companySection.addWidget(CardService.newKeyValue()
             .setTopLabel('Domain')
@@ -140,7 +140,7 @@ function openSideBar(e) {
       // Deals
       var dealSection = CardService.newCardSection();
       dealSection.setHeader('Deals');
-      if (data.deals && data.company.deals > 0) {
+      if (data.deals && data.deals.length > 0) {
         data.deals.forEach(function (deal) {
           dealSection.addWidget(
             CardService.newKeyValue()
@@ -268,43 +268,29 @@ function newContact(e) {
   details.addWidget(
     CardService.newTextInput()
     .setFieldName('emailInput')
+    .setValue(e.parameters.email)
     .setTitle('E-mail')
-    .setHint('New contact e-mail')
   )
 
   details.addWidget(
     CardService.newTextInput()
     .setFieldName('nameInput')
     .setTitle('Name')
-    .setHint('New contact name')
   )
 
   details.addWidget(
     CardService.newTextInput()
     .setFieldName('phoneNrInput')
     .setTitle('PhoneNr')
-    .setHint('New contact phoneNr')
   )
 
   details.addWidget(
     CardService.newTextInput()
     .setFieldName('departmentInput')
     .setTitle('Department')
-    .setHint('New contact department')
   )
 
-  details.addWidget(
-    CardService.newTextInput()
-    .setFieldName('originalIdInput')
-    .setTitle('OriginalId')
-  )
-
-  details.addWidget(
-    CardService.newTextInput()
-    .setFieldName('companyIdInput')
-    .setTitle('CompanyId')
-  )
-  var action = CardService.newAction().setFunctionName('postNewContact');
+  var action = CardService.newAction().setFunctionName('postNewContact').setParameters({"companyId": e.parameters.company});
 
   details.addWidget(CardService.newButtonSet()
     .addButton(CardService.newTextButton().setText('Opslaan').setOnClickAction(action)));
@@ -410,8 +396,8 @@ function saveSlackChannel(e) {
 function postNewContact(e) {
   var url = 'https://hp-develop.herokuapp.com/api/contacts';
   var data = {
-    "originalId": String(e.formInput.originalIdInput),
-    "companyId": Number(e.formInput.companyIdInput),
+    "originalId": "addon-" + Utilities.getUuid(),
+    "companyId": Number(e.parameters.companyId),
     "name": String(e.formInput.nameInput),
     "email": String(e.formInput.emailInput),
     "phoneNr": String(e.formInput.phoneNrInput),
@@ -424,4 +410,7 @@ function postNewContact(e) {
   }
 
   UrlFetchApp.fetch(url, HTTPoptions);
+
+  openSideBar(e);
+  return CardService.newNavigation().updateCard(card.build());
 }
