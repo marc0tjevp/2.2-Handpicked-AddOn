@@ -53,6 +53,34 @@ let post = (req, res) => {
 
 }
 
+let get = (req, res) => {
+    request('get', 'http://handpicked.post-tech.nl:5000/api/Companies/', {}, (data) => {
+
+        if (data && data.companies) {
+
+            formattedCompanies = []
+
+            data.companies.forEach(company => {
+                if (company.name != "Verwijderd bedrijf") {
+                    formattedCompanies.push({
+                        companyId: company.companyId,
+                        originalId: company.originalId,
+                        name: company.name
+                    })
+                }
+            })
+
+            res.status(200).json(formattedCompanies).end()
+        } else {
+            res.status(404).json({
+                "Company Controller": "Couldn't find any companies"
+            }).end()
+        }
+
+    })
+}
+
 module.exports = {
-    post
+    post,
+    get
 }
