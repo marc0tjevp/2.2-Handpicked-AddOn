@@ -6,7 +6,7 @@ let post = (req, res) => {
     let slack = req.body.slack || ''
     let companyId = req.body.companyId || ''
 
-    if (slack == '' || companyId == '') {
+    if (companyId == '') {
         res.status(412).json({
             "Company Controller: ": "Please provide parameters slack and companyId"
         }).end()
@@ -23,7 +23,7 @@ let post = (req, res) => {
         } else {
 
             // If company exists, edit the slack channel
-            if (c && c.slack) {
+            if (c && c.slack || c && c.slack == "") {
                 c.slack = slack
                 c.save()
                 res.status(200).json(c).end()
