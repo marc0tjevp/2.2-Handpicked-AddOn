@@ -94,6 +94,7 @@ let get = (req, res) => {
 
                             // Format contacts
                             formattedContacts = []
+                            slackchannel = c.slack || ''
 
                             result.contacts.forEach(contact => {
                                 if (contact.name != "Verwijderd contact") {
@@ -113,7 +114,7 @@ let get = (req, res) => {
                                 company: {
                                     id: result.companyId,
                                     name: result.name,
-                                    slack: c.slack,
+                                    slack: slackchannel,
                                     domains: c.domains,
                                     originalId: result.originalId,
                                     label: result.label
