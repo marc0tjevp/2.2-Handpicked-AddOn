@@ -210,9 +210,9 @@ function openSideBar(e) {
       });
 
       if (data.company.slack.length > 0) {
-        return card.addSection(companySection).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+        return card.addSection(companySection).addSection(contactSection).addSection(dealSection).addSection(appointmentSection).build();
       } else {
-        return card.addSection(companySection).addSection(contactSection).addSection(slackSection).addSection(dealSection).addSection(appointmentSection).addSection(ticketSection).build();
+        return card.addSection(companySection).addSection(contactSection).addSection(slackSection).addSection(dealSection).addSection(appointmentSection).build();
       }
 
     }
