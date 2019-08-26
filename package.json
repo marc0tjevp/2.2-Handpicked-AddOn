@@ -1,0 +1,24 @@
+{
+  "name": "2.2-handpicked-addon",
+  "version": "1.0.0",
+  "description": "Handpicked Gmail Addon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "push": "clasp push --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marc0tjevp/2.2-Handpicked-AddOn.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marc0tjevp/2.2-Handpicked-AddOn/issues"
+  },
+  "homepage": "https://github.com/marc0tjevp/2.2-Handpicked-AddOn#readme",
+  "dependencies": {
+    "@google/clasp": "^1.7.0",
+    "@types/google-apps-script": "0.0.33"
+  }
+}

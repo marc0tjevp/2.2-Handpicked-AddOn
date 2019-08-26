@@ -1,0 +1,25 @@
+{
+  "timeZone": "Europe/Paris",
+  "dependencies": {
+  },
+  "webapp": {
+    "access": "MYSELF",
+    "executeAs": "USER_DEPLOYING"
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "oauthScopes": ["https://www.googleapis.com/auth/gmail.addons.execute", "https://www.googleapis.com/auth/gmail.addons.current.message.readonly", "https://www.googleapis.com/auth/script.external_request", "https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/calendar.events.readonly","https://www.googleapis.com/auth/forms"],
+  "gmail": {
+    "name": "Handpicked Agencies Gmail Addon",
+    "logoUrl": "https://media.licdn.com/dms/image/C510BAQFyYSWcD51naw/company-logo_200_200/0?e=2159024400&v=beta&t=i2m0Id0NKBKWa7ZkcZug3eyABU86hLfaOrk3F6q5O9I",
+    "primaryColor": "#4285F4",
+    "secondaryColor": "#00BCD4",
+    "contextualTriggers": [{
+      "unconditional": {
+      },
+      "onTriggerFunction": "openSideBar"
+    }],
+    "openLinkUrlPrefixes": [
+      "https://avansinformaticabreda.slack.com/messages/"
+    ]    
+  }
+}
